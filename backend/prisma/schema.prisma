@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  bookmarks Bookmark[]
+  folders   Folder[]
+
+  @@map("users") // nombre real de la tabla en la BD
+}
+
+model Folder {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relación con usuario (owner)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // auto-referencia para carpetas anidadas
+  parentId String?
+  parent   Folder?  @relation("FolderChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children Folder[] @relation("FolderChildren")
+
+  // marcadores dentro de esta carpeta
+  bookmarks Bookmark[]
+
+  @@map("folders")
+}
+
+model Bookmark {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  description String?  // opcional
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // relacion con usuario (owner)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // relacion con carpeta (opcional, puede estar sin carpeta)
+  folderId String?
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  // relacion n:n con tags
+  tags BookmarkTag[]
+
+  @@map("bookmarks")
+}
+
+model Tag {
+  id   String @id @default(cuid())
+  name String @unique // "design", "react", etc, sin duplicados globales
+
+  // Relación M:N con marcadores
+  bookmarks BookmarkTag[]
+
+  @@map("tags")
+}
+
+// tabla intermedia Bookmark <-> Tag 
+model BookmarkTag {
+  bookmarkId String
+  tagId      String
+
+  bookmark Bookmark @relation(fields: [bookmarkId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  // clave primaria compuesta: un bookmark no puede tener el mismo tag dos veces
+  @@id([bookmarkId, tagId])
+  @@map("bookmark_tags")
+}
