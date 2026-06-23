@@ -1,0 +1,254 @@
+import { prisma } from '@/utils/prisma';
+import { AppError } from '@/middleware/errorHandler';
+import { PaginationParams, PaginatedResponse } from '@/types';
+
+// tipos locales 
+interface CreateBookmarkInput {
+    title: string;
+    url: string;
+    description?: string;
+    folderId?: string;
+    tagNames?: string[];
+}
+
+interface UpdateBookmarkInput {
+    title?: string;
+    url?: string;
+    description?: string;
+    folderId?: string | null; // null = quitar de carpeta
+    tagNames?: string[];
+}
+
+interface ListBookmarksParams extends PaginationParams {
+    search?: string;
+    folderId?: string;
+    tagName?: string;
+}
+
+// helper para validar URL 
+const validateUrl = (url: string): void => {
+    try {
+        const parsed = new URL(url);
+        // solo permite http y https
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+            throw new AppError('El URL tiene que tener http o https al principio.', 400);
+        }
+    } catch (e) {
+        if (e instanceof AppError) throw e;
+        throw new AppError('URL Invalido', 400);
+    }
+};
+
+// helper para resolver tags (crear si no existen)
+// dado un array de nombre de tags, devuelve los ids, crea los tags que no existan todavia
+const resolveTagIds = async (tagNames: string[]): Promise<string[]> => {
+    const normalized = tagNames
+        .map(t => t.toLowerCase().trim())
+        .filter(t => t.length > 0);
+
+    const ids: string[] = [];
+
+    for (const name of normalized) {
+        const tag = await prisma.tag.upsert({
+            where: { name },
+            update: {},  // si existe, no cambia nada
+            create: { name }, // si no existe, crea
+        });
+        ids.push(tag.id);
+    }
+
+    return ids;
+};
+
+// helper: include estandar para queries de bookmarks
+// centraliza que relaciones se incluyen siempre
+const bookmarkInclude = {
+    folder: {
+        select: { id: true, name: true },
+    },
+    tags: {
+        include: {
+            tag: {
+                select: { id: true, name: true },
+            },
+        },
+    },
+} as const;
+
+export const listBookmarks = async (
+    userId: string,
+    params: ListBookmarksParams
+): Promise<PaginatedResponse<unknown>> => {
+    const { page = 1, limit = 20, search, folderId, tagName } = params;
+    const skip = (page - 1) * limit;
+
+    const where = {
+        userId,
+        // filtro por carpeta (si se pasa "root", buscar sin carpeta)
+        ...(folderId === 'root'
+            ? { folderId: null }
+            : folderId
+            ? { folderId }
+            : {}),
+            // filtro por tag
+            ...(tagName
+            ? { tags: { some: { tag: { name: tagName.toLowerCase() } } } }
+            : {}),
+        // Búsqueda en título, URL y descripción
+        ...(search
+            ? {
+                OR: [
+                    { title: { contains: search } },
+                    { url: { contains: search } },
+                    { description: { contains: search } },
+                ],
+                }
+        : {}),
+    };
+
+    // ejecuta count y query en paralelo para mejor rendimiento
+    const [total, items] = await Promise.all([
+        prisma.bookmark.count({ where }),
+        prisma.bookmark.findMany({
+            where,
+            include: bookmarkInclude,
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit,
+        }),
+    ]);
+
+    return {
+        items,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+    };
+};
+
+export const getBookmarkById = async (
+    id: string,
+    userId: string
+) => {
+    const bookmark = await prisma.bookmark.findFirst({
+        where: { id, userId }, // solo el dueño puede verlo
+        include: bookmarkInclude,
+    });
+
+    if (!bookmark) {
+        throw new AppError('No se encontro el marcador.', 404);
+    }
+
+    return bookmark;
+};
+
+export const createBookmark = async (
+    userId: string,
+    input: CreateBookmarkInput
+) => {
+    const { title, url, description, folderId, tagNames = [] } = input;
+
+    validateUrl(url);
+
+    // verifica que la carpeta pertenece al usuario
+    if (folderId) {
+        const folder = await prisma.folder.findFirst({
+            where: { id: folderId, userId },
+        });
+        if (!folder) {
+            throw new AppError('No se encontro la carpeta.', 404);
+        }
+    }
+
+    const tagIds = await resolveTagIds(tagNames);
+
+    const bookmark = await prisma.bookmark.create({
+        data: {
+            title,
+            url,
+            description,
+            userId,
+            folderId: folderId || null,
+            tags: {
+                create: tagIds.map(tagId => ({ tagId })),
+            },
+        },
+        include: bookmarkInclude,
+    });
+
+    return bookmark;
+};
+
+export const updateBookmark = async (
+    id: string,
+    userId: string,
+    input: UpdateBookmarkInput
+) => {
+    // verifica existencia y dueño
+    const existing = await prisma.bookmark.findFirst({
+        where: { id, userId },
+    });
+
+    if (!existing) {
+        throw new AppError('No se encontro el marcador.', 404);
+    }
+
+    const { title, url, description, folderId, tagNames } = input;
+
+    if (url) validateUrl(url);
+
+    // verifica dueño de la nueva carpeta
+    if (folderId) {
+        const folder = await prisma.folder.findFirst({
+            where: { id: folderId, userId },
+        });
+        if (!folder) {
+            throw new AppError('No se encontro la carpeta.', 404);
+        }
+    }
+
+    // si se pasan tagNames, reemplaza todos los tags del bookmark
+    let tagsUpdate = {};
+    if (tagNames !== undefined) {
+        const tagIds = await resolveTagIds(tagNames);
+        tagsUpdate = {
+            tags: {
+                // borra todos los tags actuales y crea los nuevos
+                deleteMany: {},
+                create: tagIds.map(tagId => ({ tagId })),
+            },
+        };
+    }
+
+    const bookmark = await prisma.bookmark.update({
+        where: { id },
+        data: {
+            ...(title && { title }),
+            ...(url && { url }),
+            // description puede ser string vacio para borrarla
+            ...(description !== undefined && { description }),
+            // folderId puede ser null para quitar de carpeta
+            ...(folderId !== undefined && { folderId }),
+            ...tagsUpdate,
+        },
+        include: bookmarkInclude,
+    });
+
+    return bookmark;
+};
+
+export const deleteBookmark = async (
+    id: string,
+    userId: string
+): Promise<void> => {
+    const existing = await prisma.bookmark.findFirst({
+        where: { id, userId },
+    });
+
+    if (!existing) {
+        throw new AppError('No se encontro el marcador.', 404);
+    }
+
+    await prisma.bookmark.delete({ where: { id } });
+};

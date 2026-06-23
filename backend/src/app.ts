@@ -3,6 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { errorHandler } from '@/middleware/errorHandler';
 import authRouter from '@/routes/auth.routes';
+import bookmarkRouter from '@/routes/bookmark.routes';
+import folderRouter from '@/routes/folder.routes';
+import tagRouter from '@/routes/tag.routes';
 
 dotenv.config();
 
@@ -26,16 +29,19 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRouter);
+app.use('/api/bookmarks', bookmarkRouter);
+app.use('/api/folders', folderRouter);
+app.use('/api/tags', tagRouter);
 
 app.use((_req, res) => {
-    res.status(404).json({ success: false, message: 'Route not found' });
+    res.status(404).json({ success: false, message: 'Ruta no encontrada' });
 });
 
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-    console.info(`Server running on http://localhost:${PORT}`);
-    console.info(`Environment: ${process.env.NODE_ENV}`);
+    console.info(`Servidor corriendo en http://localhost:${PORT}`);
+    console.info(`Entorno: ${process.env.NODE_ENV}`);
 });
 
 export default app;
