@@ -83,3 +83,7 @@ ul, ol {
     user-select: none;
     line-height: 1;
 }
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

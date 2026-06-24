@@ -1,0 +1,233 @@
+.container {
+    padding: var(--space-xl) var(--space-lg);
+}
+
+/* breadcrumb  */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-xs);
+    font-size: var(--font-size-label-sm);
+    letter-spacing: var(--letter-spacing-label-sm);
+    text-transform: uppercase;
+    color: var(--on-surface-variant);
+}
+
+.breadcrumbCurrent {
+    color: var(--primary);
+    font-weight: var(--font-weight-bold);
+}
+
+.breadcrumbIcon {
+    font-size: 14px;
+}
+
+/* encabezado  */
+.title {
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-h1);
+    letter-spacing: var(--letter-spacing-h1);
+    color: var(--on-surface);
+    margin-bottom: var(--space-xs);
+}
+
+.subtitle {
+    font-size: var(--font-size-body-lg);
+    color: var(--on-surface-variant);
+    line-height: var(--line-height-body-lg);
+    margin-bottom: var(--space-xl);
+}
+
+/* subcarpetas (bento grid)  */
+.sectionLabel {
+    font-size: var(--font-size-label-sm);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-label-sm);
+    text-transform: uppercase;
+    color: var(--on-surface-variant);
+    margin-bottom: var(--space-md);
+}
+
+.foldersGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.folderCard {
+    background-color: var(--surface-container-lowest);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    cursor: pointer;
+    transition:
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
+    text-align: left;
+    font-family: var(--font-family);
+    width: 100%;
+}
+
+.folderCard:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.folderCardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-lg);
+}
+
+.folderIcon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--secondary-container);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--on-secondary-container);
+    font-size: 22px;
+}
+
+.folderCount {
+    font-size: var(--font-size-label-sm);
+    color: var(--on-surface-variant);
+}
+
+.folderName {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    color: var(--on-surface);
+    margin-bottom: var(--space-xs);
+    line-height: var(--line-height-h3);
+    transition: color var(--transition-fast);
+}
+
+.folderCard:hover .folderName {
+    color: var(--primary);
+}
+
+.folderSub {
+    font-size: var(--font-size-caption);
+    color: var(--on-surface-variant);
+    line-height: var(--line-height-caption);
+}
+
+/* tarjeta "nueva subcarpeta"  */
+.newFolderCard {
+    border: 1px dashed var(--outline-variant);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    background: none;
+    font-family: var(--font-family);
+    min-height: 120px;
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast);
+}
+
+.newFolderCard:hover {
+    background-color: var(--surface-container-low);
+    border-color: var(--primary);
+}
+
+.newFolderIconWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--surface-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--on-surface-variant);
+    font-size: 22px;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.newFolderCard:hover .newFolderIconWrapper {
+    background-color: var(--primary-container);
+    color: var(--on-primary-container);
+}
+
+.newFolderLabel {
+    font-size: var(--font-size-label-md);
+    font-weight: var(--font-weight-medium);
+    color: var(--on-surface-variant);
+    transition: color var(--transition-fast);
+}
+
+.newFolderCard:hover .newFolderLabel {
+    color: var(--primary);
+}
+
+/* filtros rapidos  */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.filterLabel {
+    font-size: var(--font-size-label-md);
+    color: var(--on-surface-variant);
+}
+
+.filterChip {
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    background-color: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    color: var(--on-surface-variant);
+    font-family: var(--font-family);
+    font-size: var(--font-size-label-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        border-color var(--transition-fast);
+}
+
+.filterChip:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.filterChipActive {
+    background-color: var(--primary);
+    color: var(--on-primary);
+    border-color: var(--primary);
+}
+
+/* grilla de marcadores  */
+.bookmarksGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* estado de carga  */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    color: var(--on-surface-variant);
+    gap: var(--space-sm);
+}

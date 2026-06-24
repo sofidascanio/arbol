@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { Login } from '@/pages/Login/Login';
 import { Register } from '@/pages/Register/Register';
+import { Dashboard } from '@/pages/Dashboard/Dashboard';
 import '@/styles/global.css';
 import '@/styles/typography.css';
 
@@ -46,9 +47,7 @@ const AppRoutes = () => {
 				path="/"
 				element={
 				<ProtectedRoute>
-					<div style={{ padding: 40, color: 'var(--on-surface)' }}>
-					✅ Autenticado correctamente
-					</div>
+					<Dashboard />
 				</ProtectedRoute>
 				}
 			/>

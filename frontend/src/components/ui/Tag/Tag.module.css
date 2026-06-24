@@ -1,0 +1,42 @@
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-label-sm);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-label-sm);
+    line-height: var(--line-height-label);
+    white-space: nowrap;
+    cursor: default;
+    transition: opacity var(--transition-fast);
+}
+
+.default {
+    background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
+}
+
+.tertiary {
+    background-color: var(--tertiary-fixed);
+    color: var(--on-tertiary-fixed-variant);
+}
+
+.primary {
+    background-color: var(--primary);
+    color: var(--on-primary);
+}
+
+.surface {
+    background-color: var(--surface-container-high);
+    color: var(--on-surface-variant);
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.clickable:hover {
+    opacity: 0.8;
+}

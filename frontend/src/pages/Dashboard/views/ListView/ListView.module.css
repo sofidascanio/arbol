@@ -1,0 +1,200 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* encabezado de tabla  */
+.tableHeader {
+    display: flex;
+    align-items: center;
+    padding: var(--space-sm) var(--space-lg);
+    border-bottom: 1px solid var(--outline-variant);
+    background-color: var(--surface-container-lowest);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-size: var(--font-size-label-sm);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-label-sm);
+    color: var(--on-surface-variant);
+    text-transform: uppercase;
+}
+
+.colIcon { width: 40px; flex-shrink: 0; }
+.colTitle { flex: 1; padding: 0 var(--space-md); }
+.colUrl { width: 260px; padding: 0 var(--space-md); }
+.colTags { width: 180px; padding: 0 var(--space-md); }
+.colDate { width: 140px; padding: 0 var(--space-md); }
+.colAction { width: 48px; flex-shrink: 0; }
+
+/* filas  */
+.rows {
+    flex: 1;
+    overflow-y: auto;
+    divide-y: 1px solid var(--outline-variant);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    padding: var(--space-sm) var(--space-lg);
+    border-bottom: 1px solid var(--outline-variant);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.row:hover {
+    background-color: var(--surface-container-low);
+}
+
+.rowIcon {
+    width: 40px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.rowTitle {
+    flex: 1;
+    padding: 0 var(--space-md);
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-medium);
+    color: var(--on-surface);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rowUrl {
+    width: 260px;
+    padding: 0 var(--space-md);
+    overflow: hidden;
+}
+
+.rowUrlLink {
+    font-size: var(--font-size-caption);
+    color: var(--outline);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    transition: color var(--transition-fast);
+}
+
+.rowUrlLink:hover {
+    color: var(--primary);
+}
+
+.rowTags {
+    width: 180px;
+    padding: 0 var(--space-md);
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+}
+
+.rowDate {
+    width: 140px;
+    padding: 0 var(--space-md);
+    font-size: var(--font-size-caption);
+    color: var(--outline);
+}
+
+.rowAction {
+    width: 48px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.row:hover .rowAction {
+    opacity: 1;
+}
+
+.openBtn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: none;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--on-surface-variant);
+    transition: background-color var(--transition-fast);
+}
+
+.openBtn:hover {
+    background-color: var(--surface-container-high);
+    color: var(--on-surface);
+}
+
+/* fila "nuevo marcador"  */
+.addRow {
+    display: flex;
+    align-items: center;
+    padding: var(--space-sm) var(--space-lg);
+    color: var(--outline);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+    border: none;
+    background: none;
+    font-family: var(--font-family);
+    width: 100%;
+    text-align: left;
+    gap: var(--space-md);
+}
+
+.addRow:hover {
+    color: var(--primary);
+}
+
+/* footer  */
+.footer {
+    height: 40px;
+    border-top: 1px solid var(--outline-variant);
+    background-color: var(--surface-container-low);
+    padding: 0 var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--on-surface-variant);
+    flex-shrink: 0;
+}
+
+.footerLeft {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.footerDot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--outline-variant);
+}
+
+.footerRight {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--on-surface-variant);
+}
+
+/* estado de carga  */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    color: var(--on-surface-variant);
+    gap: var(--space-sm);
+}
