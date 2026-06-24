@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { useTheme } from '@/context/ThemeContext';
+import { ThemePanel } from '@/components/ui/ThemePanel/ThemePanel';
 import { Button } from '@/components/ui/Button/Button';
 import { cn } from '@/utils/cn';
 import styles from './TopNav.module.css';
@@ -27,10 +28,9 @@ export const TopNav = ({
     searchValue,
     onAddNew,
 }: TopNavProps) => {
-    const { theme, toggleTheme } = useTheme();
+    const { themeDefinition, openPanel } = useTheme();
     const searchRef = useRef<HTMLInputElement>(null);
 
-    // atajo de teclado Cmd/Ctrl + K para enfocar la búsqueda
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -43,8 +43,9 @@ export const TopNav = ({
     }, []);
 
     return (
+        <>
         <header className={styles.topnav}>
-            {/* busqueda  */}
+            {/* busqueda */}
             <div className={styles.searchWrapper}>
                 <span className={cn('material-symbols-outlined', styles.searchIcon)}>
                     search
@@ -66,12 +67,12 @@ export const TopNav = ({
                     <button
                         key={tab.key}
                         className={cn(
-                        styles.viewTab,
-                        viewMode === tab.key && styles.viewTabActive
+                            styles.viewTab,
+                            viewMode === tab.key && styles.viewTabActive
                         )}
                         onClick={() => onViewChange(tab.key)}
                     >
-                        {tab.label}
+                    {tab.label}
                     </button>
                 ))}
             </nav>
@@ -87,11 +88,13 @@ export const TopNav = ({
 
                 <div className={styles.divider} />
 
-                <button className={styles.themeBtn}
-                        onClick={toggleTheme}
-                        title={theme === 'light' ? 'Cambiar a oscuro' : 'Cambiar a claro'}>
+                <button
+                    className={styles.themeBtn}
+                    onClick={openPanel}
+                    title="Personalizar tema"
+                >
                     <span className="material-symbols-outlined">
-                        {theme === 'light' ? 'dark_mode' : 'light_mode'}
+                        {themeDefinition.isDark ? 'dark_mode' : 'light_mode'}
                     </span>
                 </button>
 
@@ -100,5 +103,9 @@ export const TopNav = ({
                 </Button>
             </div>
         </header>
+
+        {/* panel de temas, se renderiza fuera del header para el z-index */}
+        <ThemePanel />
+        </>
     );
 };

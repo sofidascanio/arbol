@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Folder } from '@/types';
 import { cn } from '@/utils/cn';
+import { useTheme } from '@/context/ThemeContext';
 import styles from './SideNav.module.css';
 
 interface SideNavProps {
@@ -33,16 +34,18 @@ export const SideNav = ({
         { icon: 'lightbulb', label: 'Inspiration' },
     ];
 
+    const { openPanel } = useTheme();
+
     return (
         <aside className={styles.sidebar}>
             {/* marca  */}
             <div className={styles.brand}>
                 <div className={styles.brandIcon}>
-                    <span className="material-symbols-outlined">bookmark</span>
+                    <span className="material-symbols-outlined">account_tree</span>
                 </div>
                 <div className={styles.brandText}>
                     <span className={styles.brandName}>Arbol</span>
-                    <span className={styles.brandSub}>Archivo de conocimiento</span>
+                    <span className={styles.brandSub}>Archivo personal</span>
                 </div>
             </div>
 
@@ -106,6 +109,12 @@ export const SideNav = ({
 
             {/* footer  */}
             <div className={styles.footer}>
+                <button className={styles.navItem} onClick={openPanel}>
+                    <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
+                        palette
+                    </span>
+                    <span className={styles.navItemLabel}>Apariencia</span>
+                </button>
                 <button className={styles.navItem}>
                     <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
                         settings
@@ -119,7 +128,6 @@ export const SideNav = ({
                     </span>
                     <span className={styles.navItemLabel}>Cerrar sesión</span>
                 </button>
-
                 <div className={styles.userInfo}>
                     <div className={styles.avatar}>
                         <span className="material-symbols-outlined" style={{ fontSize: 18 }}>

@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { Login } from '@/pages/Login/Login';
 import { Register } from '@/pages/Register/Register';
 import { Dashboard } from '@/pages/Dashboard/Dashboard';
+import { ToastProvider } from '@/context/ToastContext';
 import '@/styles/global.css';
 import '@/styles/typography.css';
 
@@ -57,15 +58,17 @@ const AppRoutes = () => {
 };
 
 const App = () => {
-    return (
+	return (
 		<BrowserRouter>
 			<ThemeProvider>
 				<AuthProvider>
-					<AppRoutes />
+					<ToastProvider>
+						<AppRoutes />
+					</ToastProvider>
 				</AuthProvider>
 			</ThemeProvider>
 		</BrowserRouter>
-    );
+	);
 };
 
 export default App;

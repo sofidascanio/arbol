@@ -86,4 +86,32 @@ ul, ol {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}                                                                     
+
+/* transicion de tema global */
+
+/* transiciona colores cuando cambiar data-theme */
+*,
+*::before,
+*::after {
+    transition:
+        background-color 200ms ease,
+        border-color 200ms ease,
+        color 200ms ease;
+}
+
+/* excepciones, elementos donde la transicion se ve rara */
+input,
+textarea,
+select,
+button,
+a,
+img,
+.material-symbols-outlined {
+    transition:
+        background-color 200ms ease,
+        border-color 200ms ease,
+        color 150ms ease,
+        opacity 150ms ease,
+        transform 150ms ease;
 }
