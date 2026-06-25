@@ -211,3 +211,59 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+/* fila de seccion con boton +  */
+.sectionRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg) var(--space-sm) var(--space-sm);
+}
+
+.sectionRow .sectionLabel {
+    padding: 0; /* resetea el padding que tenia solo */
+}
+
+.sectionAddBtn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: none;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--on-surface-variant);
+    opacity: 0;
+    transition:
+        opacity var(--transition-fast),
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+    flex-shrink: 0;
+}
+
+/* muestra el + cuando se hace hover sobre la fila de seccion */
+.sectionRow:hover .sectionAddBtn {
+    opacity: 1;
+}
+
+.sectionAddBtn:hover {
+    background-color: var(--surface-container-high);
+    color: var(--primary);
+}
+
+.folderRow {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-md);
+}
+
+.folderRow .sectionAddBtn {
+    opacity: 0;
+}
+
+.folderRow:hover .sectionAddBtn {
+    opacity: 1;
+}

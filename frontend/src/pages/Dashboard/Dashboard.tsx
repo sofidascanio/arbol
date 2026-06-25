@@ -41,6 +41,20 @@ export const Dashboard = ({ children }: DashboardProps) => {
         }
     }, [createFolder]);
 
+    const handleNewTag = useCallback(async () => {
+        const name = prompt('Nombre de la nueva etiqueta:');
+        if (!name?.trim()) return;
+
+        try {
+            // el endpoint de tags crea la etiqueta al asignarla a un marcador
+            // por ahora guarda nombre y muestre feedback al usuario
+            alert(`Etiqueta "${name.trim()}" lista. Asignala a un marcador al crearlo o editarlo.`);
+        } catch {
+            alert('No se pudo crear la etiqueta');
+        }
+    }, []);
+
+
     const handleAddNew = useCallback(() => {
         setIsModalOpen(true);
     }, []);
@@ -58,6 +72,7 @@ export const Dashboard = ({ children }: DashboardProps) => {
                 activeFolderId={activeFolderId}
                 onFolderClick={handleFolderClick}
                 onNewFolder={handleNewFolder}
+                onNewTag={handleNewTag}
             />
 
             <div className={styles.main}>

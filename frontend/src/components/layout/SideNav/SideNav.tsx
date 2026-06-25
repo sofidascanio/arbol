@@ -10,6 +10,7 @@ interface SideNavProps {
     activeFolderId?: string;
     onFolderClick: (folderId: string) => void;
     onNewFolder: () => void;
+    onNewTag: () => void;
 }
 
 const TAG_COLORS = ['#60a5fa', '#4ade80', '#fbbf24', '#f87171', '#c084fc'];
@@ -19,20 +20,9 @@ export const SideNav = ({
     activeFolderId,
     onFolderClick,
     onNewFolder,
+    onNewTag,
 }: SideNavProps) => {
     const { user, logout } = useAuth();
-
-    // Extraer tags únicos de las carpetas para mostrar en sidebar
-    const mainNavItems = [
-        { icon: 'bookmark', label: 'Todos los marcadores', path: '/' },
-        { icon: 'star', label: 'Favoritos', path: '/favorites' },
-    ];
-
-    const folderNavItems = [
-        { icon: 'work', label: 'Work' },
-        { icon: 'person', label: 'Personal' },
-        { icon: 'lightbulb', label: 'Inspiration' },
-    ];
 
     const { openPanel } = useTheme();
 
@@ -79,32 +69,68 @@ export const SideNav = ({
                 </NavLink>
 
                 {/* carpetas dinamicas  */}
-                    {folders.length > 0 && (
-                    <>
-                        <span className={styles.sectionLabel}>Carpetas</span>
-                        {folders.map(folder => (
-                            <FolderNavItem
-                                key={folder.id}
-                                folder={folder}
-                                activeFolderId={activeFolderId}
-                                onFolderClick={onFolderClick}
-                                depth={0}
-                            />
-                        ))}
-                    </>
-                )}
+                <div className={styles.sectionRow}>
+                    <span className={styles.sectionLabel}>Carpetas</span>
+                    <button
+                        className={styles.sectionAddBtn}
+                        onClick={onNewFolder}
+                        title="Nueva carpeta"
+                        aria-label="Nueva carpeta"
+                    >
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
+                        add
+                        </span>
+                    </button>
+                </div>
+
+                {folders.map(folder => (
+                    <FolderNavItem
+                        key={folder.id}
+                        folder={folder}
+                        activeFolderId={activeFolderId}
+                        onFolderClick={onFolderClick}
+                        onNewSubfolder={async (parentId) => {
+                            const name = prompt('Nombre de la subcarpeta:');
+                            if (!name?.trim()) return;
+                            try {
+                                // llama directamente al servicio
+                                const { folderService } = await import('@/services/folder.service');
+                                await folderService.create({ name: name.trim(), parentId });
+                                // refresca carpetas
+                                window.location.reload(); // temporal
+                            } catch {
+                                alert('No se pudo crear la subcarpeta');
+                            }
+                        }}
+                        depth={0}
+                    />
+                ))}
 
                 {/* tags de ejemplo  */}
-                <span className={styles.sectionLabel}>Etiquetas</span>
+                <div className={styles.sectionRow}>
+                    <span className={styles.sectionLabel}>Etiquetas</span>
+                    <button
+                        className={styles.sectionAddBtn}
+                        onClick={onNewTag}
+                        title="Nueva etiqueta"
+                        aria-label="Nueva etiqueta"
+                    >
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
+                        add
+                        </span>
+                    </button>
+                </div>
+
                 {['Diseño', 'Ingeniería', 'Recursos', 'Inspiración'].map((tag, i) => (
                     <button key={tag} className={styles.navItem}>
                         <span
-                        className={styles.tagDot}
-                        style={{ backgroundColor: TAG_COLORS[i] }}
+                            className={styles.tagDot}
+                            style={{ backgroundColor: TAG_COLORS[i] }}
                         />
                         <span className={styles.navItemLabel}>{tag}</span>
                     </button>
                 ))}
+
             </nav>
 
             {/* footer  */}
@@ -156,6 +182,7 @@ interface FolderNavItemProps {
     folder: Folder;
     activeFolderId?: string;
     onFolderClick: (id: string) => void;
+    onNewSubfolder?: (parentId: string) => void;
     depth: number;
 }
 
@@ -163,42 +190,78 @@ const FolderNavItem = ({
     folder,
     activeFolderId,
     onFolderClick,
+    onNewSubfolder,
     depth,
 }: FolderNavItemProps) => {
     const isActive = folder.id === activeFolderId;
 
     return (
         <>
-        <button
-            className={cn(styles.navItem, isActive && styles.navItemActive)}
-            style={{ paddingLeft: `calc(var(--space-sm) + ${depth * 16}px)` }}
-            onClick={() => onFolderClick(folder.id)}
-        >
-            <span className={cn('material-symbols-outlined', styles.navItemIcon)}
-            style={{ fontSize: 20 }}>
-            {folder.children?.length > 0 ? 'folder_open' : 'folder'}
-            </span>
-            <span className={styles.navItemLabel}>{folder.name}</span>
-            {folder._count.bookmarks > 0 && (
-            <span style={{
-                fontSize: 'var(--font-size-caption)',
-                color: 'var(--on-surface-variant)',
-                marginLeft: 'auto',
-            }}>
-                {folder._count.bookmarks}
-            </span>
-            )}
-        </button>
+            <div className={cn(styles.folderRow, isActive && styles.navItemActive)}>
+                <button
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-md)',
+                        flex: 1,
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'inherit',
+                        font: 'inherit',
+                        padding: 0,
+                        minWidth: 0,
+                    }}
+                    onClick={() => onFolderClick(folder.id)}
+                >
+                <span
+                    className={cn('material-symbols-outlined', styles.navItemIcon)}
+                    style={{ fontSize: 20 }}
+                >
+                    {folder.children?.length > 0 ? 'folder_open' : 'folder'}
+                </span>
+                <span className={styles.navItemLabel}>{folder.name}</span>
+                {folder._count.bookmarks > 0 && (
+                    <span style={{
+                        fontSize: 'var(--font-size-caption)',
+                        color: 'var(--on-surface-variant)',
+                        marginLeft: 'auto',
+                        paddingRight: 'var(--space-xs)',
+                    }}>
+                        {folder._count.bookmarks}
+                    </span>
+                )}
+                </button>
 
-        {folder.children?.map(child => (
-            <FolderNavItem
-            key={child.id}
-            folder={child}
-            activeFolderId={activeFolderId}
-            onFolderClick={onFolderClick}
-            depth={depth + 1}
-            />
-        ))}
+                {/* Botón + para subcarpeta — aparece en hover */}
+                {onNewSubfolder && (
+                    <button
+                        className={styles.sectionAddBtn}
+                        onClick={e => {
+                            e.stopPropagation();
+                            onNewSubfolder(folder.id);
+                        }}
+                        title={`Nueva subcarpeta en ${folder.name}`}
+                        aria-label={`Nueva subcarpeta en ${folder.name}`}
+                        style={{ marginRight: 'var(--space-xs)', opacity: undefined }}
+                    >
+                        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+                        add
+                        </span>
+                    </button>
+                )}
+            </div>
+
+            {folder.children?.map(child => (
+                <FolderNavItem
+                    key={child.id}
+                    folder={child}
+                    activeFolderId={activeFolderId}
+                    onFolderClick={onFolderClick}
+                    onNewSubfolder={onNewSubfolder}
+                    depth={depth + 1}
+                />
+            ))}
         </>
     );
 };
