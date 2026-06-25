@@ -6,6 +6,7 @@ import authRouter from '@/routes/auth.routes';
 import bookmarkRouter from '@/routes/bookmark.routes';
 import folderRouter from '@/routes/folder.routes';
 import tagRouter from '@/routes/tag.routes';
+import importExportRouter from '@/routes/importexport.routes';
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/bookmarks', bookmarkRouter);
 app.use('/api/folders', folderRouter);
 app.use('/api/tags', tagRouter);
+app.use('/api/import-export', importExportRouter);
 
 app.use((_req, res) => {
     res.status(404).json({ success: false, message: 'Ruta no encontrada' });

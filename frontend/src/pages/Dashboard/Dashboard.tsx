@@ -8,7 +8,11 @@ import { NewBookmarkModal } from './components/NewBookmarkModal/NewBookmarkModal
 import { useFolders } from '@/hooks/useFolders';
 import styles from './Dashboard.module.css';
 
-export const Dashboard = () => {
+interface DashboardProps {
+    children?: React.ReactNode;
+}
+
+export const Dashboard = ({ children }: DashboardProps) => {
     const [viewMode, setViewMode] = useState<ViewMode>('gallery');
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFolderId, setActiveFolderId] = useState<string | undefined>();
@@ -66,28 +70,32 @@ export const Dashboard = () => {
                 />
 
                 <main className={styles.content}>
-                    {viewMode === 'gallery' && (
-                        <GalleryView
-                            key={`gallery-${refreshKey}`}
-                            searchQuery={deferredSearch}
-                            activeFolderId={activeFolderId}
-                            onAddNew={handleAddNew}
-                        />
-                    )}
-                    {viewMode === 'list' && (
-                        <ListView
-                            key={`list-${refreshKey}`}
-                            searchQuery={deferredSearch}
-                            activeFolderId={activeFolderId}
-                            onAddNew={handleAddNew}
-                        />
-                    )}
-                    {viewMode === 'folders' && (
-                        <FoldersView
-                            key={`folders-${refreshKey}`}
-                            searchQuery={deferredSearch}
-                            onAddNew={handleAddNew}
-                        />
+                    {children ?? ( 
+                        <> 
+                            {viewMode === 'gallery' && (
+                                <GalleryView
+                                    key={`gallery-${refreshKey}`}
+                                    searchQuery={deferredSearch}
+                                    activeFolderId={activeFolderId}
+                                    onAddNew={handleAddNew}
+                                />
+                            )}
+                            {viewMode === 'list' && (
+                                <ListView
+                                    key={`list-${refreshKey}`}
+                                    searchQuery={deferredSearch}
+                                    activeFolderId={activeFolderId}
+                                    onAddNew={handleAddNew}
+                                />
+                            )}
+                            {viewMode === 'folders' && (
+                                <FoldersView
+                                    key={`folders-${refreshKey}`}
+                                    searchQuery={deferredSearch}
+                                    onAddNew={handleAddNew}
+                                />
+                            )}
+                        </>
                     )}
                 </main>
             </div>

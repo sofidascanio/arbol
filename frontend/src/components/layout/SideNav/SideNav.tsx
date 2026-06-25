@@ -115,6 +115,16 @@ export const SideNav = ({
                     </span>
                     <span className={styles.navItemLabel}>Apariencia</span>
                 </button>
+                <NavLink to="/import-export"
+                    className={({ isActive }) =>
+                        cn(styles.navItem, isActive && styles.navItemActive)
+                    }
+                >
+                    <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
+                        import_export
+                    </span>
+                    <span className={styles.navItemLabel}>Importar / Exportar</span>
+                </NavLink>
                 <button className={styles.navItem}>
                     <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
                         settings

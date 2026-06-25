@@ -5,6 +5,7 @@ import { Login } from '@/pages/Login/Login';
 import { Register } from '@/pages/Register/Register';
 import { Dashboard } from '@/pages/Dashboard/Dashboard';
 import { ToastProvider } from '@/context/ToastContext';
+import { ImportExport } from '@/pages/ImportExport/ImportExport';
 import '@/styles/global.css';
 import '@/styles/typography.css';
 
@@ -52,6 +53,16 @@ const AppRoutes = () => {
 				</ProtectedRoute>
 				}
 			/>
+			<Route
+				path="/import-export"
+				element={
+					<ProtectedRoute>
+						<Dashboard>
+							<ImportExport />
+						</Dashboard>
+					</ProtectedRoute>
+				}
+				/>
 			<Route path="*" element={<Navigate to="/" replace />} />
 		</Routes>
 	);
