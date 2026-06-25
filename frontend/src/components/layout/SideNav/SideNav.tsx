@@ -41,7 +41,7 @@ export const SideNav = ({
             {/* marca  */}
             <div className={styles.brand}>
                 <div className={styles.brandIcon}>
-                    <span className="material-symbols-outlined">account_tree</span>
+                    <span className="material-symbols-outlined">park</span>
                 </div>
                 <div className={styles.brandText}>
                     <span className={styles.brandName}>Arbol</span>
