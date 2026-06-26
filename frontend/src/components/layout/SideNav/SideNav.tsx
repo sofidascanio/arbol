@@ -3,24 +3,33 @@ import { useAuth } from '@/context/AuthContext';
 import { Folder } from '@/types';
 import { cn } from '@/utils/cn';
 import { useTheme } from '@/context/ThemeContext';
+import { Tag } from '@/services/tag.service';
 import styles from './SideNav.module.css';
 
 interface SideNavProps {
     folders: Folder[];
+    tags: Tag[]; 
     activeFolderId?: string;
+    activeTagName?: string; 
     onFolderClick: (folderId: string) => void;
+    onTagClick: (tagName: string) => void;
     onNewFolder: () => void;
     onNewTag: () => void;
+    onNewSubfolder?: (parentId: string, parentName: string) => void;
 }
 
 const TAG_COLORS = ['#60a5fa', '#4ade80', '#fbbf24', '#f87171', '#c084fc'];
 
 export const SideNav = ({
     folders,
+    tags,
     activeFolderId,
+    activeTagName,
     onFolderClick,
+    onTagClick,
     onNewFolder,
     onNewTag,
+    onNewSubfolder
 }: SideNavProps) => {
     const { user, logout } = useAuth();
 
@@ -89,19 +98,9 @@ export const SideNav = ({
                         folder={folder}
                         activeFolderId={activeFolderId}
                         onFolderClick={onFolderClick}
-                        onNewSubfolder={async (parentId) => {
-                            const name = prompt('Nombre de la subcarpeta:');
-                            if (!name?.trim()) return;
-                            try {
-                                // llama directamente al servicio
-                                const { folderService } = await import('@/services/folder.service');
-                                await folderService.create({ name: name.trim(), parentId });
-                                // refresca carpetas
-                                window.location.reload(); // temporal
-                            } catch {
-                                alert('No se pudo crear la subcarpeta');
-                            }
-                        }}
+                        onNewSubfolder={(parentId, parentName) =>
+                            onNewSubfolder?.(parentId, parentName)
+                        }
                         depth={0}
                     />
                 ))}
@@ -121,15 +120,42 @@ export const SideNav = ({
                     </button>
                 </div>
 
-                {['Diseño', 'Ingeniería', 'Recursos', 'Inspiración'].map((tag, i) => (
-                    <button key={tag} className={styles.navItem}>
+                {tags.length === 0 ? (
+                    <span style={{
+                        fontSize: 'var(--font-size-caption)',
+                        color: 'var(--on-surface-variant)',
+                        padding: 'var(--space-xs) var(--space-sm)',
+                        opacity: 0.6,
+                    }}>
+                        Sin etiquetas todavía
+                    </span>
+                    ) : (
+                    tags.map((tag, i) => (
+                        <button
+                            key={tag.id}
+                            className={cn(
+                                styles.navItem,
+                                activeTagName === tag.name && styles.navItemActive
+                            )}
+                            onClick={() => onTagClick(tag.name)}
+                        >
                         <span
                             className={styles.tagDot}
-                            style={{ backgroundColor: TAG_COLORS[i] }}
+                            style={{ backgroundColor: TAG_COLORS[i % TAG_COLORS.length] }}
                         />
-                        <span className={styles.navItemLabel}>{tag}</span>
-                    </button>
-                ))}
+                        <span className={styles.navItemLabel}>{tag.name}</span>
+                        {tag.bookmarkCount > 0 && (
+                            <span style={{
+                                fontSize: 'var(--font-size-caption)',
+                                color: 'var(--on-surface-variant)',
+                                marginLeft: 'auto',
+                            }}>
+                            {tag.bookmarkCount}
+                            </span>
+                        )}
+                        </button>
+                    ))
+                )}
 
             </nav>
 
@@ -182,7 +208,7 @@ interface FolderNavItemProps {
     folder: Folder;
     activeFolderId?: string;
     onFolderClick: (id: string) => void;
-    onNewSubfolder?: (parentId: string) => void;
+    onNewSubfolder?: (parentId: string, parentName: string) => void;
     depth: number;
 }
 
@@ -233,13 +259,13 @@ const FolderNavItem = ({
                 )}
                 </button>
 
-                {/* Botón + para subcarpeta — aparece en hover */}
+                {/* boton + para subcarpeta, aparece en hover */}
                 {onNewSubfolder && (
                     <button
                         className={styles.sectionAddBtn}
                         onClick={e => {
                             e.stopPropagation();
-                            onNewSubfolder(folder.id);
+                            onNewSubfolder(folder.id, folder.name);
                         }}
                         title={`Nueva subcarpeta en ${folder.name}`}
                         aria-label={`Nueva subcarpeta en ${folder.name}`}

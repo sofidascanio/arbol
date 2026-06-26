@@ -7,6 +7,7 @@ import styles from './ListView.module.css';
 interface ListViewProps {
     searchQuery: string;
     activeFolderId?: string;
+    activeTagName?: string; 
     onAddNew: () => void;
 }
 
@@ -37,6 +38,7 @@ const formatDateShort = (dateStr: string): string => {
 export const ListView = ({
     searchQuery,
     activeFolderId,
+    activeTagName,
     onAddNew,
 }: ListViewProps) => {
     const { bookmarks, total, isLoading, fetchBookmarks } = useBookmarks();
@@ -45,8 +47,9 @@ export const ListView = ({
         fetchBookmarks({
             search: searchQuery || undefined,
             folderId: activeFolderId,
+            tag: activeTagName || undefined,
         });
-    }, [searchQuery, activeFolderId]); // eslint-disable-line
+    }, [searchQuery, activeFolderId, activeTagName]); 
 
     return (
         <div className={styles.container}>

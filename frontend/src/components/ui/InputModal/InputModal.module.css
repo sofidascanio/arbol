@@ -1,0 +1,123 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.description {
+    font-size: var(--font-size-body-md);
+    color: var(--on-surface-variant);
+    line-height: var(--line-height-body-md);
+}
+
+.inputWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.label {
+    font-size: var(--font-size-label-md);
+    font-weight: var(--font-weight-medium);
+    color: var(--on-surface-variant);
+}
+
+.input {
+    width: 100%;
+    background-color: var(--surface-container-low);
+    color: var(--on-surface);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-family);
+    font-size: var(--font-size-body-md);
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+    border-color: var(--primary);
+}
+
+.input::placeholder {
+    color: var(--on-surface-variant);
+    opacity: 0.5;
+}
+
+.error {
+    font-size: var(--font-size-caption);
+    color: var(--error);
+}
+
+/* preview del color del tag  */
+.colorRow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.colorPicker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.colorSwatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition:
+        transform var(--transition-fast),
+        border-color var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.colorSwatch:hover {
+    transform: scale(1.15);
+}
+
+.colorSwatchActive {
+    border-color: var(--on-surface);
+    transform: scale(1.1);
+}
+
+/* preview de carpeta  */
+.preview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--surface-container-low);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--outline-variant);
+}
+
+.previewIcon {
+    color: var(--primary);
+    font-size: 20px;
+}
+
+.previewLabel {
+    font-size: var(--font-size-body-md);
+    color: var(--on-surface);
+    font-weight: var(--font-weight-medium);
+}
+
+.previewLabelEmpty {
+    color: var(--on-surface-variant);
+    opacity: 0.5;
+}
+
+.parentInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-medium);
+}

@@ -7,6 +7,7 @@ import styles from './GalleryView.module.css';
 interface GalleryViewProps {
     searchQuery: string;
     activeFolderId?: string;
+    activeTagName?: string; 
     onAddNew: () => void;
 }
 
@@ -21,6 +22,7 @@ const QUICK_FILTERS = [
 export const GalleryView = ({
     searchQuery,
     activeFolderId,
+    activeTagName,
     onAddNew,
 }: GalleryViewProps) => {
     const [activeTag, setActiveTag] = useState('');
@@ -31,9 +33,9 @@ export const GalleryView = ({
         fetchBookmarks({
             search: searchQuery || undefined,
             folderId: activeFolderId,
-            tag: activeTag || undefined,
+             tag: activeTagName || undefined, 
         });
-    }, [searchQuery, activeFolderId, activeTag]); 
+    }, [searchQuery, activeFolderId, activeTagName]); 
 
     const handleDelete = useCallback(async (id: string) => {
         if (!confirm('¿Eliminar este marcador?')) return;
