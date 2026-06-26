@@ -231,3 +231,40 @@
     color: var(--on-surface-variant);
     gap: var(--space-sm);
 }
+
+/* conteo en chips de etiqueta */
+.filterChipCount {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    margin-left: var(--space-xs);
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+    background-color: var(--surface-container-high);
+    color: var(--on-surface-variant);
+}
+
+.filterChipActive .filterChipCount {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: inherit;
+}
+
+/* estado vacio */
+.empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--on-surface-variant);
+}
+
+.emptyTitle {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-xs);
+    color: var(--on-surface);
+}

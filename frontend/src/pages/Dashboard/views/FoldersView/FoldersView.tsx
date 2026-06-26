@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useFolders } from '@/hooks/useFolders';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { Folder } from '@/types';
 import { BookmarkCard } from '../../components/BookmarkCard/BookmarkCard';
+import { InputModal } from '@/components/ui/InputModal/InputModal';
 import { cn } from '@/utils/cn';
 import styles from './FoldersView.module.css';
 
@@ -11,19 +12,15 @@ interface FoldersViewProps {
     onAddNew: () => void;
 }
 
-const QUICK_FILTERS = [
-    { label: 'Todos', value: '' },
-    { label: 'Sitios web', value: 'web' },
-    { label: 'Apps móviles', value: 'mobile' },
-    { label: 'Ilustración', value: 'illustration' },
-    { label: 'Arte 3D', value: '3d' },
-];
-
 export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
-    const { folders, isLoading: foldersLoading, createFolder } = useFolders();
+    const { folders, isLoading: foldersLoading, createFolder, fetchFolders } = useFolders();
     const { bookmarks, isLoading: bookmarksLoading, fetchBookmarks } = useBookmarks();
+
     const [activeFilter, setActiveFilter] = useState('');
     const [activeFolderPath, setActiveFolderPath] = useState<Folder[]>([]);
+
+    // Estado del modal de nueva subcarpeta
+    const [folderModal, setFolderModal] = useState(false);
 
     const currentFolder = activeFolderPath[activeFolderPath.length - 1];
     const currentFolderChildren = currentFolder?.children ?? folders;
@@ -34,7 +31,45 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
             folderId: currentFolder?.id,
             tag: activeFilter || undefined,
         });
-    }, [searchQuery, currentFolder?.id, activeFilter]); 
+        setActiveFilter('');
+    }, [searchQuery, currentFolder?.id]);
+
+    // re-fetch al cambiar etiqueta sin resetearla
+    useEffect(() => {
+        fetchBookmarks({
+            search: searchQuery || undefined,
+            folderId: currentFolder?.id,
+            tag: activeFilter || undefined,
+        });
+    }, [activeFilter]); 
+
+    // extrae etiquetas unicas de los bookmarks cargados
+    const availableTags = useMemo(() => {
+        const seen = new Map<string, { name: string; count: number }>();
+
+        for (const bookmark of bookmarks) {
+            for (const bt of bookmark.tags) {
+                const name = bt.tag.name;
+                if (seen.has(name)) {
+                    seen.get(name)!.count++;
+                } else {
+                    seen.set(name, { name, count: 1 });
+                }
+            }
+        }
+
+        return [...seen.values()].sort(
+            (a, b) => b.count - a.count || a.name.localeCompare(b.name)
+        );
+    }, [bookmarks]);
+
+    // filtra bookmarks localmente por etiqueta
+    const filteredBookmarks = useMemo(() => {
+        if (!activeFilter) return bookmarks;
+        return bookmarks.filter(bm =>
+            bm.tags.some(bt => bt.tag.name === activeFilter)
+        );
+    }, [bookmarks, activeFilter]);
 
     const handleFolderClick = (folder: Folder) => {
         setActiveFolderPath(prev => [...prev, folder]);
@@ -48,62 +83,64 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
         setActiveFolderPath([]);
     };
 
-    const handleNewSubfolder = async () => {
-        const name = prompt('Nombre de la nueva subcarpeta:');
-        if (!name?.trim()) return;
-            try {
-            await createFolder({
-                name: name.trim(),
-                parentId: currentFolder?.id,
-            });
-        } catch {
-            alert('No se pudo crear la carpeta');
-        }
+    const handleCreateSubfolder = async (name: string) => {
+        await createFolder({
+            name,
+            parentId: currentFolder?.id,
+        });
+        await fetchFolders();
+    };
+
+    const handleTagFilter = (tagName: string) => {
+        setActiveFilter(prev => (prev === tagName ? '' : tagName));
     };
 
     return (
         <div className={styles.container}>
             {/* breadcrumb  */}
             <div className={styles.breadcrumb}>
-                <span style={{ cursor: 'pointer' }}
-                    onClick={handleRootClick}>
+                <span style={{ cursor: 'pointer' }} onClick={handleRootClick}>
                     Archivo
                 </span>
                 {activeFolderPath.map((folder, i) => (
-                <>
-                    <span key={`sep-${folder.id}`}
-                        className={cn('material-symbols-outlined', styles.breadcrumbIcon)}>
+                    <>
+                        <span
+                            key={`sep-${folder.id}`}
+                            className={cn('material-symbols-outlined', styles.breadcrumbIcon)}
+                        >
                         chevron_right
-                    </span>
-                    <span key={folder.id}
-                        className={
-                            i === activeFolderPath.length - 1
-                            ? styles.breadcrumbCurrent
-                            : ''
-                        }
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => handleBreadcrumbClick(i)}>
+                        </span>
+                        <span
+                            key={folder.id}
+                            className={
+                                i === activeFolderPath.length - 1
+                                ? styles.breadcrumbCurrent
+                                : ''
+                            }
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => handleBreadcrumbClick(i)}
+                        >
                         {folder.name}
-                    </span>
-                </>
+                        </span>
+                    </>
                 ))}
             </div>
 
             {/* encabezado  */}
-            <h1 className={styles.title}>
-                {currentFolder?.name ?? 'Carpetas'}
-            </h1>
+            <h1 className={styles.title}>{currentFolder?.name ?? 'Carpetas'}</h1>
             <p className={styles.subtitle}>
                 {currentFolder
-                ? `Contenido de la carpeta ${currentFolder.name}`
-                : 'Colección curada de referencias visuales, patrones de UI y recursos creativos.'}
+                    ? `Contenido de la carpeta ${currentFolder.name}`
+                    : 'Colección curada de referencias visuales, patrones de UI y recursos creativos.'}
             </p>
 
             {/* subcarpetas  */}
             {foldersLoading ? (
                 <div className={styles.loading}>
-                    <span className="material-symbols-outlined"
-                        style={{ animation: 'spin 1s linear infinite' }}>
+                    <span
+                        className="material-symbols-outlined"
+                        style={{ animation: 'spin 1s linear infinite' }}
+                    >
                         progress_activity
                     </span>
                 </div>
@@ -112,16 +149,18 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
                     <p className={styles.sectionLabel}>Subcolecciones</p>
                     <div className={styles.foldersGrid}>
                         {currentFolderChildren.map(folder => (
-                            <button key={folder.id}
-                                    className={styles.folderCard}
-                                    onClick={() => handleFolderClick(folder)}>
+                            <button
+                                key={folder.id}
+                                className={styles.folderCard}
+                                onClick={() => handleFolderClick(folder)}
+                            >
                                 <div className={styles.folderCardHeader}>
                                     <div className={styles.folderIcon}>
                                         <span className="material-symbols-outlined">folder</span>
                                     </div>
                                     <span className={styles.folderCount}>
                                         {folder._count.bookmarks} elementos
-                                    </span>
+                                </span>
                                 </div>
                                 <div className={styles.folderName}>{folder.name}</div>
                                 <div className={styles.folderSub}>
@@ -132,9 +171,11 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
                             </button>
                         ))}
 
-                        {/* Nueva subcarpeta */}
-                        <button className={styles.newFolderCard}
-                                onClick={handleNewSubfolder}>
+                        {/* nueva subcarpeta */}
+                        <button
+                            className={styles.newFolderCard}
+                            onClick={() => setFolderModal(true)}
+                        >
                             <div className={styles.newFolderIconWrapper}>
                                 <span className="material-symbols-outlined">add</span>
                             </div>
@@ -144,38 +185,90 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
                 </>
             ) : null}
 
-            {/* filtros rapidos  */}
-            <div className={styles.filters}>
-                <span className={styles.filterLabel}>Filtros rápidos:</span>
-                {QUICK_FILTERS.map(f => (
-                    <button key={f.value}
-                            className={cn(
-                            styles.filterChip,
-                            activeFilter === f.value && styles.filterChipActive
-                            )}
-                            onClick={() => setActiveFilter(f.value)}
-                        >
-                        {f.label}
-                    </button>
-                ))}
-            </div>
+            {/* filtros por etiqueta */}
+            {!bookmarksLoading && availableTags.length > 0 && (
+                <div className={styles.filters}>
+                    <span className={styles.filterLabel}>Etiquetas:</span>
 
-            {/* marcadores de la carpeta  */}
+                    <button
+                        className={cn(
+                            styles.filterChip,
+                            activeFilter === '' && styles.filterChipActive
+                        )}
+                        onClick={() => setActiveFilter('')}
+                    >
+                        Todos
+                        <span className={styles.filterChipCount}>{bookmarks.length}</span>
+                    </button>
+
+                    {availableTags.map(tag => (
+                        <button
+                            key={tag.name}
+                            className={cn(
+                                styles.filterChip,
+                                activeFilter === tag.name && styles.filterChipActive
+                            )}
+                            onClick={() => handleTagFilter(tag.name)}
+                        >
+                            {tag.name}
+                            <span className={styles.filterChipCount}>{tag.count}</span>
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {/* marcadores */}
             {bookmarksLoading ? (
                 <div className={styles.loading}>
-                    <span className="material-symbols-outlined"
-                        style={{ animation: 'spin 1s linear infinite' }}>
+                    <span
+                        className="material-symbols-outlined"
+                        style={{ animation: 'spin 1s linear infinite' }}
+                    >
                         progress_activity
                     </span>
                     Cargando marcadores...
                 </div>
             ) : (
                 <div className={styles.bookmarksGrid}>
-                    {bookmarks.map(bookmark => (
+                    {filteredBookmarks.length === 0 && !bookmarksLoading && (
+                        <div className={styles.empty}>
+                            <p className={styles.emptyTitle}>
+                                {activeFilter
+                                ? `Sin marcadores con la etiqueta "${activeFilter}"`
+                                : 'Esta carpeta está vacía'}
+                            </p>
+                            <p>
+                                {activeFilter
+                                ? 'Proba seleccionando otra etiqueta.'
+                                : 'Agrega marcadores o exploré las subcarpetas.'}
+                            </p>
+                        </div>
+                    )}
+
+                    {filteredBookmarks.map(bookmark => (
                         <BookmarkCard key={bookmark.id} bookmark={bookmark} />
                     ))}
                 </div>
             )}
+
+            {/* modal nueva subcarpeta  */}
+            <InputModal
+                isOpen={folderModal}
+                onClose={() => setFolderModal(false)}
+                onConfirm={handleCreateSubfolder}
+                title={currentFolder ? 'Nueva subcarpeta' : 'Nueva carpeta'}
+                subtitle={
+                currentFolder
+                    ? `Dentro de "${currentFolder.name}"`
+                    : 'Organizá tus marcadores'
+                }
+                icon="create_new_folder"
+                label="Nombre de la carpeta"
+                placeholder="Ej: Diseño, Recursos, Referencias..."
+                confirmLabel="Crear carpeta"
+                previewIcon="folder"
+                parentName={currentFolder?.name}
+            />
         </div>
     );
 };

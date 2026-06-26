@@ -167,3 +167,29 @@
     margin-bottom: var(--space-xs);
     color: var(--on-surface);
 }
+
+/* conteo dentro del chip de etiqueta  */
+.filterChipCount {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    margin-left: var(--space-xs);
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+}
+
+.filterChipActive .filterChipCount {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* cuando el chip no esta activo, el conteo usa otro fondo */
+.filterChip:not(.filterChipActive) .filterChipCount {
+    background-color: var(--surface-container-high);
+    color: var(--on-surface-variant);
+}
