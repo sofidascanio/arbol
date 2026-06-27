@@ -5,6 +5,8 @@ import { Folder } from '@/types';
 import { BookmarkCard } from '../../components/BookmarkCard/BookmarkCard';
 import { InputModal } from '@/components/ui/InputModal/InputModal';
 import { cn } from '@/utils/cn';
+import { folderService } from '@/services/folder.service';
+import { useToastContext } from '@/context/ToastContext';
 import styles from './FoldersView.module.css';
 
 interface FoldersViewProps {
@@ -24,6 +26,8 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
 
     const currentFolder = activeFolderPath[activeFolderPath.length - 1];
     const currentFolderChildren = currentFolder?.children ?? folders;
+
+    const toast = useToastContext();
 
     useEffect(() => {
         fetchBookmarks({
@@ -95,6 +99,25 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
         setActiveFilter(prev => (prev === tagName ? '' : tagName));
     };
 
+    const handleDeleteFolder = async () => {
+        if (!currentFolder) return;
+
+        const confirmed = window.confirm(
+            `¿Eliminar la carpeta "${currentFolder.name}"?\n\nLos marcadores dentro quedarán sin carpeta.`
+        );
+        if (!confirmed) return;
+
+        try {
+            await folderService.delete(currentFolder.id);
+            await fetchFolders();
+            // vuelve al nivel anterior en el breadcrumb
+            setActiveFolderPath(prev => prev.slice(0, -1));
+            toast.success(`Carpeta "${currentFolder.name}" eliminada`);
+        } catch {
+            toast.error('No se pudo eliminar la carpeta');
+        }
+    };
+
     return (
         <div className={styles.container}>
             {/* breadcrumb  */}
@@ -127,12 +150,30 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
             </div>
 
             {/* encabezado  */}
-            <h1 className={styles.title}>{currentFolder?.name ?? 'Carpetas'}</h1>
-            <p className={styles.subtitle}>
-                {currentFolder
-                    ? `Contenido de la carpeta ${currentFolder.name}`
-                    : 'Colección curada de referencias visuales, patrones de UI y recursos creativos.'}
-            </p>
+            <div className={styles.titleRow}>
+                <div>
+                    <h1 className={styles.title}>{currentFolder?.name ?? 'Carpetas'}</h1>
+                    <p className={styles.subtitle}>
+                        {currentFolder
+                            ? `Contenido de la carpeta ${currentFolder.name}`
+                            : 'Colección curada de referencias visuales, patrones de UI y recursos creativos.'}
+                    </p>
+                </div>
+
+                {/* boton eliminar, solo visible dentro de una carpeta */}
+                {currentFolder && (
+                    <button
+                        className={styles.deleteBtn}
+                        onClick={handleDeleteFolder}
+                        title="Eliminar carpeta"
+                    >
+                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                            delete
+                        </span>
+                        Eliminar carpeta
+                    </button>
+                )}
+            </div>
 
             {/* subcarpetas  */}
             {foldersLoading ? (
@@ -144,9 +185,11 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
                         progress_activity
                     </span>
                 </div>
-            ) : currentFolderChildren.length > 0 || !currentFolder ? (
+            ) : (
                 <>
-                    <p className={styles.sectionLabel}>Subcolecciones</p>
+                    <p className={styles.sectionLabel}>
+                        {currentFolder ? 'Subcarpetas' : 'Colecciones'}
+                    </p>
                     <div className={styles.foldersGrid}>
                         {currentFolderChildren.map(folder => (
                             <button
@@ -160,7 +203,7 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
                                     </div>
                                     <span className={styles.folderCount}>
                                         {folder._count.bookmarks} elementos
-                                </span>
+                                    </span>
                                 </div>
                                 <div className={styles.folderName}>{folder.name}</div>
                                 <div className={styles.folderSub}>
@@ -179,11 +222,13 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
                             <div className={styles.newFolderIconWrapper}>
                                 <span className="material-symbols-outlined">add</span>
                             </div>
-                            <span className={styles.newFolderLabel}>Nueva subcarpeta</span>
+                            <span className={styles.newFolderLabel}>
+                                {currentFolder ? 'Nueva subcarpeta' : 'Nueva carpeta'}
+                            </span>
                         </button>
                     </div>
                 </>
-            ) : null}
+            )}
 
             {/* filtros por etiqueta */}
             {!bookmarksLoading && availableTags.length > 0 && (

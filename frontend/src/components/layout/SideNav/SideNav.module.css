@@ -9,11 +9,10 @@
     top: 0;
     left: 0;
     z-index: 40;
-    padding: var(--space-lg) var(--space-md);
+    padding: 0 var(--space-md);
     transition: background-color var(--transition-normal);
-    overflow-y: auto;
-    scrollbar-width: none;   /* Firefox */
-    -ms-overflow-style: none;  /* IE/Edge */
+    overflow-x: clip;
+    overflow-y: visible;
 }
 
 /* cabecera  */
@@ -21,9 +20,18 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
+    margin-top: var(--space-lg);
     margin-bottom: var(--space-xl);
     padding: 0 var(--space-xs);
     flex-shrink: 0;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: opacity var(--transition-fast);
+}
+
+.brand:hover {
+    opacity: 0.8;
 }
 
 .brandIcon {
@@ -52,7 +60,8 @@
     color: var(--primary);
     line-height: var(--line-height-h3);
     white-space: nowrap;
-    overflow: hidden;
+    overflow-x: clip;
+    overflow-y: visible;
     text-overflow: ellipsis;
 }
 
@@ -93,15 +102,34 @@
     transform: scale(0.97);
 }
 
-/* navegacion  */
+/* navegacion */
 .nav {
     flex: 1;
+    min-height: 0; /* permite que el hijo flex achique y scrollee */
     display: flex;
     flex-direction: column;
     gap: 2px;
     overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--outline-variant) transparent;
+    padding-right: 2px;
+}
+
+.nav::-webkit-scrollbar {
+    width: 3px;
+}
+
+.nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.nav::-webkit-scrollbar-thumb {
+    background: var(--outline-variant);
+    border-radius: 10px;
+}
+
+.nav::-webkit-scrollbar-thumb:hover {
+    background: var(--outline);
 }
 
 .navItem {
@@ -151,7 +179,8 @@
 
 .navItemLabel {
     flex: 1;
-    overflow: hidden;
+    overflow-x: clip;
+    overflow-y: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -182,6 +211,7 @@
     flex-direction: column;
     gap: 2px;
     flex-shrink: 0;
+    padding-bottom: var(--space-lg);
 }
 
 .userInfo {
@@ -204,14 +234,16 @@
     font-size: 16px;
     flex-shrink: 0;
     border: 1px solid var(--outline-variant);
-    overflow: hidden;
+    overflow-x: clip;
+    overflow-y: visible;
 }
 
 .userName {
     font-size: var(--font-size-label-md);
     color: var(--on-surface);
     font-weight: var(--font-weight-medium);
-    overflow: hidden;
+    overflow-x: clip;
+    overflow-y: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -221,11 +253,19 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-lg) var(--space-sm) var(--space-sm);
+    padding: var(--space-sm) var(--space-sm);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+    user-select: none;
 }
 
 .sectionRow .sectionLabel {
-    padding: 0; /* resetea el padding que tenia solo */
+    padding: 0;
+}
+
+.sectionRow:hover {
+    background-color: var(--surface-container-high);
 }
 
 .sectionAddBtn {
@@ -247,7 +287,6 @@
     flex-shrink: 0;
 }
 
-/* muestra el + cuando se hace hover sobre la fila de seccion */
 .sectionRow:hover .sectionAddBtn {
     opacity: 1;
 }
@@ -257,19 +296,28 @@
     color: var(--primary);
 }
 
-.folderRow {
-    position: relative;
-    display: flex;
-    align-items: center;
-    border-radius: var(--radius-md);
+.sectionChevron {
+    font-size: 14px;
+    color: var(--on-surface-variant);
+    transition: transform var(--transition-fast);
+    flex-shrink: 0;
 }
 
-.folderRow .sectionAddBtn {
+.sectionChevronOpen {
+    transform: rotate(90deg);
+}
+
+/* animacion del contenido colapsable */
+.sectionContent {
+    overflow-x: clip;
+    overflow-y: visible;
+    transition: opacity var(--transition-fast);
+}
+
+.sectionContentHidden {
     opacity: 0;
-}
-
-.folderRow:hover .sectionAddBtn {
-    opacity: 1;
+    pointer-events: none;
+    height: 0;
 }
 
 /* hint de vacio */
@@ -282,14 +330,16 @@
 
 /* conteo de tags/bookmarks  */
 .tagCount {
+    display: inline-block;
     font-size: 10px;
     font-weight: var(--font-weight-bold);
     color: var(--on-surface-variant);
-    margin-left: auto;
+    margin-left: 5px;
     background-color: var(--surface-container-high);
     padding: 1px 5px;
     border-radius: var(--radius-full);
-    flex-shrink: 0;
+    vertical-align: middle;
+    line-height: 1.4;
 }
 
 .navItemActive .tagCount {
@@ -304,7 +354,6 @@
     align-items: center;
     border-radius: var(--radius-md);
     gap: 2px;
-    /* El padding-left se aplica via inline style para el depth */
 }
 
 .folderRow:hover {
@@ -319,6 +368,14 @@
 
 .navItemActive.folderRow:hover {
     background-color: var(--secondary-container);
+}
+
+.folderRow .sectionAddBtn {
+    opacity: 0;
+}
+
+.folderRow:hover .sectionAddBtn {
+    opacity: 1;
 }
 
 /* boton de flecha */
@@ -347,7 +404,6 @@
     flex-shrink: 0;
 }
 
-/* icono de flecha con rotacion */
 .chevron {
     font-size: 16px;
     transition: transform var(--transition-fast);
@@ -388,52 +444,8 @@
 
 /* contenedor de hijos con linea vertical */
 .folderChildren {
-  position: relative;
+    position: relative;
     margin-left: calc(var(--space-sm) + 7px);
     border-left: 1px solid var(--outline-variant);
     padding-left: 4px;
-}
-
-/* scrollbar invisible */
-.sidebar::-webkit-scrollbar {
-  display: none;    /* Chrome/Safari */
-}
-
-.nav::-webkit-scrollbar {
-    display: none;
-}
-
-/* seccion colapsable + */
-.sectionRow {
-    cursor: pointer;
-    border-radius: var(--radius-md);
-    transition: background-color var(--transition-fast);
-    user-select: none;
-}
-
-.sectionRow:hover {
-    background-color: var(--surface-container-high);
-}
-
-.sectionChevron {
-    font-size: 14px;
-    color: var(--on-surface-variant);
-    transition: transform var(--transition-fast);
-    flex-shrink: 0;
-}
-
-.sectionChevronOpen {
-    transform: rotate(90deg);
-}
-
-/* animacion del contenido colapsable */
-.sectionContent {
-    overflow: hidden;
-    transition: opacity var(--transition-fast);
-}
-
-.sectionContentHidden {
-    opacity: 0;
-    pointer-events: none;
-    height: 0;
 }

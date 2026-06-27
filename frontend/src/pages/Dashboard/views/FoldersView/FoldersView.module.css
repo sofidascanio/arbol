@@ -30,14 +30,12 @@
     line-height: var(--line-height-h1);
     letter-spacing: var(--letter-spacing-h1);
     color: var(--on-surface);
-    margin-bottom: var(--space-xs);
 }
 
 .subtitle {
     font-size: var(--font-size-body-lg);
     color: var(--on-surface-variant);
     line-height: var(--line-height-body-lg);
-    margin-bottom: var(--space-xl);
 }
 
 /* subcarpetas (bento grid)  */
@@ -267,4 +265,51 @@
     font-weight: var(--font-weight-semibold);
     margin-bottom: var(--space-xs);
     color: var(--on-surface);
+}
+
+/* fila del titulo con boton eliminar */
+.titleRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+/* saca el margin-bottom del title y subtitle porque ahora lo maneja titleRow */
+.titleRow .title {
+    margin-bottom: var(--space-xs);
+}
+
+.titleRow .subtitle {
+    margin-bottom: 0;
+}
+
+.deleteBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    background-color: var(--error-container);
+    color: var(--on-error-container);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: var(--font-size-label-md);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: var(--space-xs);
+    transition:
+        opacity var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.deleteBtn:hover {
+    opacity: 0.85;
+}
+
+.deleteBtn:active {
+    transform: scale(0.97);
 }

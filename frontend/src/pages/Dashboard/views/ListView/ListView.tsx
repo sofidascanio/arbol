@@ -48,9 +48,9 @@ const FolderCell = ({ folder }: FolderCellProps) => {
 
     return (
         <div className={styles.folderCell}>
-            <span className="material-symbols-outlined" style={{ fontSize: 14, flexShrink: 0 }}>
+            {/* <span className="material-symbols-outlined" style={{ fontSize: 14, flexShrink: 0 }}>
                 folder
-            </span>
+            </span> */}
             <span className={styles.folderName}>{folder.name}</span>
         </div>
     );

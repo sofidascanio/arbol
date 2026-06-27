@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Folder } from '@/types';
 import { cn } from '@/utils/cn';
-import { useTheme } from '@/context/ThemeContext';
 import { Tag } from '@/services/tag.service';
 import styles from './SideNav.module.css';
 
@@ -17,6 +16,7 @@ interface SideNavProps {
     onNewFolder: () => void;
     onNewTag: () => void;
     onNewSubfolder?: (parentId: string, parentName: string) => void;
+    onClearActive?: () => void;
 }
 
 const TAG_COLORS = ['#60a5fa', '#4ade80', '#fbbf24', '#f87171', '#c084fc'];
@@ -31,9 +31,9 @@ export const SideNav = ({
     onNewFolder,
     onNewTag,
     onNewSubfolder,
+    onClearActive,
 }: SideNavProps) => {
     const { user, logout } = useAuth();
-    const { openPanel } = useTheme();
 
     // estado de colapso de secciones
     const [foldersOpen, setFoldersOpen] = useState(true);
@@ -42,7 +42,7 @@ export const SideNav = ({
     return (
         <aside className={styles.sidebar}>
             {/* marca */}
-            <div className={styles.brand}>
+            <NavLink to="/" end className={styles.brand} onClick={onClearActive}>
                 <div className={styles.brandIcon}>
                     <span className="material-symbols-outlined">park</span>
                 </div>
@@ -50,7 +50,7 @@ export const SideNav = ({
                     <span className={styles.brandName}>Arbol</span>
                     <span className={styles.brandSub}>Archivo personal</span>
                 </div>
-            </div>
+            </NavLink>
 
             {/* navegacion  */}
             <nav className={styles.nav}>
@@ -60,6 +60,7 @@ export const SideNav = ({
                     className={({ isActive }) =>
                         cn(styles.navItem, isActive && styles.navItemActive)
                     }
+                    onClick={onClearActive}
                 >
                     <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
                         bookmark
@@ -184,10 +185,12 @@ export const SideNav = ({
                                     className={styles.tagDot}
                                     style={{ backgroundColor: TAG_COLORS[i % TAG_COLORS.length] }}
                                 />
-                                <span className={styles.navItemLabel}>{tag.name}</span>
-                                {tag.bookmarkCount > 0 && (
-                                    <span className={styles.tagCount}>{tag.bookmarkCount}</span>
-                                )}
+                                <span className={styles.navItemLabel}>
+                                    {tag.name}
+                                    {tag.bookmarkCount > 0 && (
+                                        <span className={styles.tagCount}>{tag.bookmarkCount}</span>
+                                    )}
+                                </span>
                             </button>
                         ))
                     )}
@@ -309,10 +312,12 @@ const FolderNavItem = ({
                     >
                         {hasChildren && isOpen ? 'folder_open' : 'folder'}
                     </span>
-                    <span className={styles.navItemLabel}>{folder.name}</span>
-                    {folder._count.bookmarks > 0 && (
-                        <span className={styles.tagCount}>{folder._count.bookmarks}</span>
-                    )}
+                    <span className={styles.navItemLabel}>
+                        {folder.name}
+                        {folder._count.bookmarks > 0 && (
+                            <span className={styles.tagCount}>{folder._count.bookmarks}</span>
+                        )}
+                    </span>
                 </button>
 
                 {/* boton + subcarpeta, aparece en hover */}

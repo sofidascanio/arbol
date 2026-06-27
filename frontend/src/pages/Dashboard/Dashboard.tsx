@@ -45,7 +45,13 @@ export const Dashboard = ({ children }: DashboardProps) => {
 
     const handleFolderClick = useCallback((folderId: string) => {
         setActiveFolderId(folderId);
+        setActiveTagName(undefined);
         setViewMode('gallery');
+    }, []);
+
+    const handleClearActive = useCallback(() => {
+        setActiveFolderId(undefined);
+        setActiveTagName(undefined);
     }, []);
 
     const handleTagClick = useCallback((tagName: string) => {
@@ -108,6 +114,8 @@ export const Dashboard = ({ children }: DashboardProps) => {
                 onTagClick={handleTagClick} 
                 onNewFolder={handleNewFolder}
                 onNewTag={handleNewTag}
+                onNewSubfolder={handleNewSubfolder}
+                onClearActive={handleClearActive}
             />
 
             <div className={styles.main}>
