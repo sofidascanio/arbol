@@ -72,3 +72,9 @@ export const updateSchema = [
         .isArray()
         .withMessage('tagNames debe ser un arreglo.'),
 ];
+
+export const favoriteSchema = [
+    param('id')
+        .notEmpty()
+        .withMessage('El ID del marcador es obligatorio.')
+];

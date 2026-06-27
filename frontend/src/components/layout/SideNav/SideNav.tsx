@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Folder } from '@/types';
 import { cn } from '@/utils/cn';
@@ -8,9 +9,9 @@ import styles from './SideNav.module.css';
 
 interface SideNavProps {
     folders: Folder[];
-    tags: Tag[]; 
+    tags: Tag[];
     activeFolderId?: string;
-    activeTagName?: string; 
+    activeTagName?: string;
     onFolderClick: (folderId: string) => void;
     onTagClick: (tagName: string) => void;
     onNewFolder: () => void;
@@ -29,15 +30,18 @@ export const SideNav = ({
     onTagClick,
     onNewFolder,
     onNewTag,
-    onNewSubfolder
+    onNewSubfolder,
 }: SideNavProps) => {
     const { user, logout } = useAuth();
-
     const { openPanel } = useTheme();
+
+    // estado de colapso de secciones
+    const [foldersOpen, setFoldersOpen] = useState(true);
+    const [tagsOpen, setTagsOpen] = useState(true);
 
     return (
         <aside className={styles.sidebar}>
-            {/* marca  */}
+            {/* marca */}
             <div className={styles.brand}>
                 <div className={styles.brandIcon}>
                     <span className="material-symbols-outlined">park</span>
@@ -48,41 +52,55 @@ export const SideNav = ({
                 </div>
             </div>
 
-            {/* boton nueva carpeta */}
-            <button className={styles.newFolderBtn} onClick={onNewFolder}>
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>add</span>
-                Nueva carpeta
-            </button>
-
-            {/* navegacion principal  */}
+            {/* navegacion  */}
             <nav className={styles.nav}>
-                <NavLink to="/"
-                        end
-                        className={({ isActive }) =>
-                            cn(styles.navItem, isActive && styles.navItemActive)
-                        }>
+                <NavLink
+                    to="/"
+                    end
+                    className={({ isActive }) =>
+                        cn(styles.navItem, isActive && styles.navItemActive)
+                    }
+                >
                     <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
                         bookmark
                     </span>
                     <span className={styles.navItemLabel}>Todos los marcadores</span>
                 </NavLink>
 
-                <NavLink to="/favorites"
-                        className={({ isActive }) =>
-                            cn(styles.navItem, isActive && styles.navItemActive)
-                        }>
+                <NavLink
+                    to="/favorites"
+                    className={({ isActive }) =>
+                        cn(styles.navItem, isActive && styles.navItemActive)
+                    }
+                >
                     <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
                         star
                     </span>
                     <span className={styles.navItemLabel}>Favoritos</span>
                 </NavLink>
 
-                {/* carpetas dinamicas  */}
-                <div className={styles.sectionRow}>
+                {/* seccion carpetas  */}
+                <div
+                    className={styles.sectionRow}
+                    onClick={() => setFoldersOpen(prev => !prev)}
+                >
                     <span className={styles.sectionLabel}>Carpetas</span>
+                    <span
+                        className={cn(
+                            'material-symbols-outlined',
+                            styles.sectionChevron,
+                            foldersOpen && styles.sectionChevronOpen
+                        )}
+                    >
+                        chevron_right
+                    </span>
+                    {/* boton + ,detiene propagacion para no colapsar al hacer click */}
                     <button
                         className={styles.sectionAddBtn}
-                        onClick={onNewFolder}
+                        onClick={e => {
+                            e.stopPropagation();
+                            onNewFolder();
+                        }}
                         title="Nueva carpeta"
                         aria-label="Nueva carpeta"
                     >
@@ -92,25 +110,49 @@ export const SideNav = ({
                     </button>
                 </div>
 
-                {folders.map(folder => (
-                    <FolderNavItem
-                        key={folder.id}
-                        folder={folder}
-                        activeFolderId={activeFolderId}
-                        onFolderClick={onFolderClick}
-                        onNewSubfolder={(parentId, parentName) =>
-                            onNewSubfolder?.(parentId, parentName)
-                        }
-                        depth={0}
-                    />
-                ))}
+                <div
+                    className={cn(
+                        styles.sectionContent,
+                        !foldersOpen && styles.sectionContentHidden
+                    )}
+                >
+                    {folders.length === 0 ? (
+                        <span className={styles.emptyHint}>Sin carpetas todavía</span>
+                    ) : (
+                        folders.map(folder => (
+                            <FolderNavItem
+                                key={folder.id}
+                                folder={folder}
+                                activeFolderId={activeFolderId}
+                                onFolderClick={onFolderClick}
+                                onNewSubfolder={onNewSubfolder}
+                                depth={0}
+                            />
+                        ))
+                    )}
+                </div>
 
-                {/* tags de ejemplo  */}
-                <div className={styles.sectionRow}>
+                {/* seccion etiquetas */}
+                <div
+                    className={styles.sectionRow}
+                    onClick={() => setTagsOpen(prev => !prev)}
+                >
                     <span className={styles.sectionLabel}>Etiquetas</span>
+                    <span
+                        className={cn(
+                            'material-symbols-outlined',
+                            styles.sectionChevron,
+                            tagsOpen && styles.sectionChevronOpen
+                        )}
+                    >
+                        chevron_right
+                    </span>
                     <button
                         className={styles.sectionAddBtn}
-                        onClick={onNewTag}
+                        onClick={e => {
+                            e.stopPropagation();
+                            onNewTag();
+                        }}
                         title="Nueva etiqueta"
                         aria-label="Nueva etiqueta"
                     >
@@ -120,69 +162,51 @@ export const SideNav = ({
                     </button>
                 </div>
 
-                {tags.length === 0 ? (
-                    <span style={{
-                        fontSize: 'var(--font-size-caption)',
-                        color: 'var(--on-surface-variant)',
-                        padding: 'var(--space-xs) var(--space-sm)',
-                        opacity: 0.6,
-                    }}>
-                        Sin etiquetas todavía
-                    </span>
+                <div
+                    className={cn(
+                        styles.sectionContent,
+                        !tagsOpen && styles.sectionContentHidden
+                    )}
+                >
+                    {tags.length === 0 ? (
+                        <span className={styles.emptyHint}>Sin etiquetas todavía</span>
                     ) : (
-                    tags.map((tag, i) => (
-                        <button
-                            key={tag.id}
-                            className={cn(
-                                styles.navItem,
-                                activeTagName === tag.name && styles.navItemActive
-                            )}
-                            onClick={() => onTagClick(tag.name)}
-                        >
-                        <span
-                            className={styles.tagDot}
-                            style={{ backgroundColor: TAG_COLORS[i % TAG_COLORS.length] }}
-                        />
-                        <span className={styles.navItemLabel}>{tag.name}</span>
-                        {tag.bookmarkCount > 0 && (
-                            <span style={{
-                                fontSize: 'var(--font-size-caption)',
-                                color: 'var(--on-surface-variant)',
-                                marginLeft: 'auto',
-                            }}>
-                            {tag.bookmarkCount}
-                            </span>
-                        )}
-                        </button>
-                    ))
-                )}
-
+                        tags.map((tag, i) => (
+                            <button
+                                key={tag.id}
+                                className={cn(
+                                    styles.navItem,
+                                    activeTagName === tag.name && styles.navItemActive
+                                )}
+                                onClick={() => onTagClick(tag.name)}
+                            >
+                                <span
+                                    className={styles.tagDot}
+                                    style={{ backgroundColor: TAG_COLORS[i % TAG_COLORS.length] }}
+                                />
+                                <span className={styles.navItemLabel}>{tag.name}</span>
+                                {tag.bookmarkCount > 0 && (
+                                    <span className={styles.tagCount}>{tag.bookmarkCount}</span>
+                                )}
+                            </button>
+                        ))
+                    )}
+                </div>
             </nav>
 
-            {/* footer  */}
+            {/* footer */}
             <div className={styles.footer}>
-                <button className={styles.navItem} onClick={openPanel}>
-                    <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
-                        palette
-                    </span>
-                    <span className={styles.navItemLabel}>Apariencia</span>
-                </button>
-                <NavLink to="/import-export"
+                <NavLink
+                    to="/import-export"
                     className={({ isActive }) =>
                         cn(styles.navItem, isActive && styles.navItemActive)
                     }
-                >
+                    >
                     <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
                         import_export
                     </span>
                     <span className={styles.navItemLabel}>Importar / Exportar</span>
                 </NavLink>
-                <button className={styles.navItem}>
-                    <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
-                        settings
-                    </span>
-                    <span className={styles.navItemLabel}>Configuración</span>
-                </button>
 
                 <button className={styles.navItem} onClick={logout}>
                     <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
@@ -190,6 +214,7 @@ export const SideNav = ({
                     </span>
                     <span className={styles.navItemLabel}>Cerrar sesión</span>
                 </button>
+
                 <div className={styles.userInfo}>
                     <div className={styles.avatar}>
                         <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
@@ -203,7 +228,7 @@ export const SideNav = ({
     );
 };
 
-// item de carpeta recursivo 
+// FolderNavItem con dropdown
 interface FolderNavItemProps {
     folder: Folder;
     activeFolderId?: string;
@@ -220,56 +245,85 @@ const FolderNavItem = ({
     depth,
 }: FolderNavItemProps) => {
     const isActive = folder.id === activeFolderId;
+    const hasChildren = (folder.children?.length ?? 0) > 0;
+
+    // expande si la carpeta activa es descendiente
+    const isAncestorOfActive = (f: Folder, targetId?: string): boolean => {
+        if (!targetId) return false;
+        return f.children?.some(
+            child => child.id === targetId || isAncestorOfActive(child, targetId)
+        ) ?? false;
+    };
+
+    const [isOpen, setIsOpen] = useState(
+        () => isActive || isAncestorOfActive(folder, activeFolderId)
+    );
+
+    const handleToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsOpen(prev => !prev);
+    };
+
+    const handleClick = () => {
+        onFolderClick(folder.id);
+        // si tiene hijos y esta cerrado, abre al hacer click
+        if (hasChildren && !isOpen) setIsOpen(true);
+    };
 
     return (
         <>
-            <div className={cn(styles.folderRow, isActive && styles.navItemActive)}>
-                <button
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 'var(--space-md)',
-                        flex: 1,
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: 'inherit',
-                        font: 'inherit',
-                        padding: 0,
-                        minWidth: 0,
-                    }}
-                    onClick={() => onFolderClick(folder.id)}
-                >
-                <span
-                    className={cn('material-symbols-outlined', styles.navItemIcon)}
-                    style={{ fontSize: 20 }}
-                >
-                    {folder.children?.length > 0 ? 'folder_open' : 'folder'}
-                </span>
-                <span className={styles.navItemLabel}>{folder.name}</span>
-                {folder._count.bookmarks > 0 && (
-                    <span style={{
-                        fontSize: 'var(--font-size-caption)',
-                        color: 'var(--on-surface-variant)',
-                        marginLeft: 'auto',
-                        paddingRight: 'var(--space-xs)',
-                    }}>
-                        {folder._count.bookmarks}
-                    </span>
+            <div
+                className={cn(styles.folderRow, isActive && styles.navItemActive)}
+                style={{ paddingLeft: `calc(var(--space-sm) + ${depth * 14}px)` }}
+            >
+                {/* flecha de dropdown, solo si tiene hijos */}
+                {hasChildren ? (
+                    <button
+                        className={styles.chevronBtn}
+                        onClick={handleToggle}
+                        aria-label={isOpen ? 'Colapsar' : 'Expandir'}
+                        tabIndex={-1}
+                    >
+                        <span className={cn(
+                                'material-symbols-outlined',
+                                styles.chevron,
+                                isOpen && styles.chevronOpen
+                            )}
+                        >
+                        chevron_right
+                        </span>
+                    </button>
+                ) : (
+                    // espacio vacio para alinear carpetas sin hijos
+                    <span className={styles.chevronPlaceholder} />
                 )}
+
+                {/* boton principal, navegar a la carpeta */}
+                <button
+                    className={styles.folderBtn}
+                    onClick={handleClick}
+                >
+                    <span
+                        className={cn('material-symbols-outlined', styles.navItemIcon)}
+                        style={{ fontSize: 20 }}
+                    >
+                        {hasChildren && isOpen ? 'folder_open' : 'folder'}
+                    </span>
+                    <span className={styles.navItemLabel}>{folder.name}</span>
+                    {folder._count.bookmarks > 0 && (
+                        <span className={styles.tagCount}>{folder._count.bookmarks}</span>
+                    )}
                 </button>
 
-                {/* boton + para subcarpeta, aparece en hover */}
+                {/* boton + subcarpeta, aparece en hover */}
                 {onNewSubfolder && (
                     <button
-                        className={styles.sectionAddBtn}
+                        className={cn(styles.sectionAddBtn, styles.folderAddBtn)}
                         onClick={e => {
                             e.stopPropagation();
                             onNewSubfolder(folder.id, folder.name);
                         }}
                         title={`Nueva subcarpeta en ${folder.name}`}
-                        aria-label={`Nueva subcarpeta en ${folder.name}`}
-                        style={{ marginRight: 'var(--space-xs)', opacity: undefined }}
                     >
                         <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
                         add
@@ -278,16 +332,21 @@ const FolderNavItem = ({
                 )}
             </div>
 
-            {folder.children?.map(child => (
-                <FolderNavItem
-                    key={child.id}
-                    folder={child}
-                    activeFolderId={activeFolderId}
-                    onFolderClick={onFolderClick}
-                    onNewSubfolder={onNewSubfolder}
-                    depth={depth + 1}
-                />
-            ))}
+            {/* hijos, muestra solo si esta abierto */}
+            {hasChildren && isOpen && (
+                <div className={styles.folderChildren}>
+                    {folder.children.map(child => (
+                        <FolderNavItem
+                            key={child.id}
+                            folder={child}
+                            activeFolderId={activeFolderId}
+                            onFolderClick={onFolderClick}
+                            onNewSubfolder={onNewSubfolder}
+                            depth={depth + 1}
+                        />
+                    ))}
+                </div>
+            )}
         </>
     );
 };

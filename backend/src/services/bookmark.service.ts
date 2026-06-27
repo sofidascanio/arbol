@@ -23,6 +23,7 @@ interface ListBookmarksParams extends PaginationParams {
     search?: string;
     folderId?: string;
     tagName?: string;
+    favoritesOnly?: boolean;
 }
 
 // helper para validar URL 
@@ -79,7 +80,7 @@ export const listBookmarks = async (
     userId: string,
     params: ListBookmarksParams
 ): Promise<PaginatedResponse<unknown>> => {
-    const { page = 1, limit = 20, search, folderId, tagName } = params;
+    const { page = 1, limit = 20, search, folderId, tagName, favoritesOnly } = params;
     const skip = (page - 1) * limit;
 
     const where = {
@@ -90,11 +91,12 @@ export const listBookmarks = async (
             : folderId
             ? { folderId }
             : {}),
-            // filtro por tag
-            ...(tagName
+        // filtro por tag
+        ...(tagName
             ? { tags: { some: { tag: { name: tagName.toLowerCase() } } } }
             : {}),
-        // Búsqueda en título, URL y descripción
+        ...(favoritesOnly ? { isFavorite: true } : {}),
+        // busqueda en titulo, url y descripcion
         ...(search
             ? {
                 OR: [
@@ -251,4 +253,29 @@ export const deleteBookmark = async (
     }
 
     await prisma.bookmark.delete({ where: { id } });
+};
+
+export const toggleFav = async (bookmarkId: string, userId: string) => {
+    const existing = await prisma.bookmark.findFirst({
+        where: { id: bookmarkId, userId },
+    });
+
+    if (!existing) {
+        return { success: false, error: 'Marcador no encontrado', statusCode: 404 };
+    }
+
+    const bookmark = await prisma.bookmark.update({
+        where: { id: bookmarkId },
+        data: { isFavorite: !existing.isFavorite },
+        include: bookmarkInclude,
+    });
+
+    const message = bookmark.isFavorite ? 'Agregado a favoritos' : 'Quitado de favoritos';
+    
+    return { 
+        success: true, 
+        data: { bookmark }, 
+        message,
+        statusCode: 200 
+    };
 };

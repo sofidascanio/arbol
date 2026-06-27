@@ -1,0 +1,100 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+/* encabezado */
+.header {
+    padding: var(--space-xl) var(--space-lg) 0;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xs);
+}
+
+.title {
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-h1);
+    letter-spacing: var(--letter-spacing-h1);
+    color: var(--on-surface);
+}
+
+.subtitle {
+    font-size: var(--font-size-body-lg);
+    color: var(--on-surface-variant);
+    line-height: var(--line-height-body-lg);
+}
+
+/* tabs de vista  */
+.viewTabs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--outline-variant);
+}
+
+.viewTab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-md);
+    border: none;
+    background: none;
+    font-family: var(--font-family);
+    font-size: var(--font-size-label-md);
+    font-weight: var(--font-weight-medium);
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.viewTab:hover {
+    background-color: var(--surface-container-high);
+    color: var(--on-surface);
+}
+
+.viewTabActive {
+    background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* busqueda  */
+.searchWrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background-color: var(--surface-container-low);
+    border-radius: var(--radius-full);
+    padding: var(--space-xs) var(--space-md);
+    margin-left: auto;
+    width: 260px;
+}
+
+.searchInput {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: var(--font-family);
+    font-size: var(--font-size-body-md);
+    color: var(--on-surface);
+    width: 100%;
+}
+
+.searchInput::placeholder {
+    color: var(--on-surface-variant);
+    opacity: 0.5;
+}
+
+.content {
+    flex: 1;
+}

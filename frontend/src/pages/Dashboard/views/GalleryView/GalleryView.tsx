@@ -9,6 +9,7 @@ interface GalleryViewProps {
     activeFolderId?: string;
     activeTagName?: string;
     onAddNew: () => void;
+    favoritesOnly?: boolean; 
 }
 
 export const GalleryView = ({
@@ -16,10 +17,10 @@ export const GalleryView = ({
     activeFolderId,
     activeTagName,
     onAddNew,
+    favoritesOnly, 
 }: GalleryViewProps) => {
     const [activeTag, setActiveTag] = useState('');
-    const { bookmarks, total, isLoading, fetchBookmarks, deleteBookmark } =
-        useBookmarks();
+    const { bookmarks, total, isLoading, fetchBookmarks, deleteBookmark, handleFavoriteToggle } = useBookmarks();
 
     // re-fetch cuando cambia carpeta, busqueda o tag del sidebar
     useEffect(() => {
@@ -27,10 +28,11 @@ export const GalleryView = ({
             search: searchQuery || undefined,
             folderId: activeFolderId,
             tag: activeTagName || undefined,
+            favoritesOnly: favoritesOnly || undefined, 
         });
         // limpia filtro local al cambiar contexto
         setActiveTag('');
-    }, [searchQuery, activeFolderId, activeTagName]);
+    }, [searchQuery, activeFolderId, activeTagName, favoritesOnly]);
 
     // extrae etiquetas unicas de los bookmarks cargados
     const availableTags = useMemo(() => {
@@ -160,6 +162,7 @@ export const GalleryView = ({
                             key={bookmark.id}
                             bookmark={bookmark}
                             onDelete={handleDelete}
+                            onFavoriteToggle={handleFavoriteToggle}
                         />
                     ))}
 

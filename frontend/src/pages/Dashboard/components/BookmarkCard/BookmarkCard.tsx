@@ -1,11 +1,13 @@
 import { Bookmark } from '@/types';
 import { Tag } from '@/components/ui/Tag/Tag';
 import { cn } from '@/utils/cn';
+import { bookmarkService } from '@/services/bookmark.service';
 import styles from './BookmarkCard.module.css';
 
 interface BookmarkCardProps {
     bookmark: Bookmark;
     onDelete?: (id: string) => void;
+    onFavoriteToggle?: (id: string, isFavorite: boolean) => void;
     className?: string;
 }
 
@@ -33,6 +35,7 @@ const formatDate = (dateStr: string): string => {
 export const BookmarkCard = ({
     bookmark,
     onDelete,
+    onFavoriteToggle,
     className,
 }: BookmarkCardProps) => {
     const handleOpen = () => window.open(bookmark.url, '_blank', 'noopener');
@@ -40,6 +43,16 @@ export const BookmarkCard = ({
     const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();
         onDelete?.(bookmark.id);
+    };
+
+    const handleFavorite = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        try {
+            const data = await bookmarkService.toggleFavorite(bookmark.id);
+            onFavoriteToggle?.(bookmark.id, data.bookmark.isFavorite);
+        } catch {
+            // silencioso
+        }
     };
 
     return (
@@ -74,6 +87,24 @@ export const BookmarkCard = ({
                             </span>
                         </button>
                     )}
+                    <button
+                        className={styles.actionBtn}
+                        onClick={handleFavorite}
+                        title={bookmark.isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{
+                                fontSize: 18,
+                                fontVariationSettings: bookmark.isFavorite
+                                    ? "'FILL' 1"
+                                    : "'FILL' 0",
+                                color: bookmark.isFavorite ? '#fbbf24' : undefined,
+                            }}
+                        >
+                            star
+                        </span>
+                    </button>
                 </div>
             </div>
 

@@ -7,6 +7,7 @@ export interface ListBookmarksParams {
     search?: string;
     folderId?: string;
     tag?: string;
+    favoritesOnly?: boolean;
 }
 
 export interface CreateBookmarkInput {
@@ -33,6 +34,7 @@ export const bookmarkService = {
         if (params.search) query.set('search', params.search);
         if (params.folderId) query.set('folderId', params.folderId);
         if (params.tag) query.set('tag', params.tag);
+        if (params.favoritesOnly) query.set('favoritesOnly', 'true');
         return api.get<{ items: Bookmark[]; total: number; page: number; limit: number; totalPages: number }>(
             `/bookmarks?${query.toString()}`
         );
@@ -41,4 +43,5 @@ export const bookmarkService = {
     create: (input: CreateBookmarkInput) => api.post<{ bookmark: Bookmark }>('/bookmarks', input),
     update: (id: string, input: UpdateBookmarkInput) => api.put<{ bookmark: Bookmark }>(`/bookmarks/${id}`, input),
     delete: (id: string) => api.delete<null>(`/bookmarks/${id}`),
+    toggleFavorite: (id: string) => api.patch<{ bookmark: Bookmark }>(`/bookmarks/${id}/favorite`),
 };

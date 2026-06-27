@@ -32,7 +32,7 @@
 .rows {
     flex: 1;
     overflow-y: auto;
-    divide-y: 1px solid var(--outline-variant);
+    /* divide-y: 1px solid var(--outline-variant); */
 }
 
 .row {

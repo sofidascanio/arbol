@@ -1,12 +1,13 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '@/types';
-import { sendSuccess } from '@/utils/response';
+import { sendSuccess, sendError } from '@/utils/response';
 import {
   listBookmarks,
   getBookmarkById,
   createBookmark,
   updateBookmark,
   deleteBookmark,
+  toggleFav
 } from '@/services/bookmark.service';
 
 // lista de bookmarks del usuario autenticado, con filtros y paginacion
@@ -26,6 +27,7 @@ export const list = async (
             search: req.query.search as string | undefined,
             folderId: req.query.folderId as string | undefined,
             tagName: req.query.tag as string | undefined,
+            favoritesOnly: req.query.favoritesOnly === 'true',
         });
 
         sendSuccess(res, result);
@@ -89,6 +91,30 @@ export const remove = async (
     try {
         await deleteBookmark(req.params.id, req.user!.id);
         sendSuccess(res, null, 'Marcador eliminado.');
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const toggleFavorite = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const result = await toggleFav(req.params.id, req.user!.id);
+
+        if (!result.success) {
+            sendError(res, result.error!, result.statusCode!);
+            return;
+        }
+
+        if (!result.data) {
+            sendError(res, 'Error al obtener el marcador', 500);
+            return;
+        }
+
+        sendSuccess(res, { bookmark: result.data.bookmark }, result.message);
     } catch (error) {
         next(error);
     }

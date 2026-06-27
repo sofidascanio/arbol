@@ -6,30 +6,31 @@ import { Register } from '@/pages/Register/Register';
 import { Dashboard } from '@/pages/Dashboard/Dashboard';
 import { ToastProvider } from '@/context/ToastContext';
 import { ImportExport } from '@/pages/ImportExport/ImportExport';
+import { Favorites } from '@/pages/Favorites/Favorites';
 import '@/styles/global.css';
 import '@/styles/typography.css';
 
 // Guard para rutas protegidas
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+	const { isAuthenticated, isLoading } = useAuth();
 
-  if (isLoading) {
-    return (
-      <div style={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'var(--on-surface-variant)',
-      }}>
-        <span className="material-symbols-outlined" style={{ fontSize: 32, animation: 'spin 1s linear infinite' }}>
-          progress_activity
-        </span>
-      </div>
-    );
-  }
+	if (isLoading) {
+		return (
+			<div style={{
+				height: '100vh',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				color: 'var(--on-surface-variant)',
+			}}>
+				<span className="material-symbols-outlined" style={{ fontSize: 32, animation: 'spin 1s linear infinite' }}>
+				progress_activity
+				</span>
+			</div>
+		);
+	}
 
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+	return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 const AppRoutes = () => {
@@ -63,6 +64,16 @@ const AppRoutes = () => {
 					</ProtectedRoute>
 				}
 				/>
+			<Route
+				path="/favorites"
+				element={
+					<ProtectedRoute>
+					<Dashboard>
+						<Favorites />
+					</Dashboard>
+					</ProtectedRoute>
+				}
+			/>
 			<Route path="*" element={<Navigate to="/" replace />} />
 		</Routes>
 	);
