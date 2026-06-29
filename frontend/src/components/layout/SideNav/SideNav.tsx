@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Folder } from '@/types';
 import { cn } from '@/utils/cn';
@@ -17,9 +17,8 @@ interface SideNavProps {
     onNewTag: () => void;
     onNewSubfolder?: (parentId: string, parentName: string) => void;
     onClearActive?: () => void;
+    onDeleteTag?: (tagId: string, tagName: string) => void;
 }
-
-const TAG_COLORS = ['#60a5fa', '#4ade80', '#fbbf24', '#f87171', '#c084fc'];
 
 export const SideNav = ({
     folders,
@@ -32,6 +31,7 @@ export const SideNav = ({
     onNewTag,
     onNewSubfolder,
     onClearActive,
+    onDeleteTag,
 }: SideNavProps) => {
     const { user, logout } = useAuth();
 
@@ -39,8 +39,39 @@ export const SideNav = ({
     const [foldersOpen, setFoldersOpen] = useState(true);
     const [tagsOpen, setTagsOpen] = useState(true);
 
+    const MIN_WIDTH = 180;
+    const MAX_WIDTH = 480;
+    const [sidebarWidth, setSidebarWidth] = useState(240);
+    const isResizing = useRef(false);
+
+    const handleResizeStart = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        isResizing.current = true;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+
+        const onMouseMove = (e: MouseEvent) => {
+            if (!isResizing.current) return;
+            const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, e.clientX));
+            setSidebarWidth(newWidth);
+            document.documentElement.style.setProperty('--sidebar-width', `${newWidth}px`);
+        };
+
+        const onMouseUp = () => {
+            isResizing.current = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }, []);
+
     return (
-        <aside className={styles.sidebar}>
+        <aside className={styles.sidebar} style={{ width: sidebarWidth }}>
+            <div className={styles.resizeHandle} onMouseDown={handleResizeStart} />
             {/* marca */}
             <NavLink to="/" end className={styles.brand} onClick={onClearActive}>
                 <div className={styles.brandIcon}>
@@ -172,26 +203,48 @@ export const SideNav = ({
                     {tags.length === 0 ? (
                         <span className={styles.emptyHint}>Sin etiquetas todavía</span>
                     ) : (
-                        tags.map((tag, i) => (
-                            <button
+                        tags.map(tag => (
+                            <div
                                 key={tag.id}
                                 className={cn(
-                                    styles.navItem,
+                                    styles.tagRow,
                                     activeTagName === tag.name && styles.navItemActive
                                 )}
-                                onClick={() => onTagClick(tag.name)}
                             >
-                                <span
-                                    className={styles.tagDot}
-                                    style={{ backgroundColor: TAG_COLORS[i % TAG_COLORS.length] }}
-                                />
-                                <span className={styles.navItemLabel}>
-                                    {tag.name}
+                                {/* boton principal, seleccionar tag */}
+                                <button
+                                    className={styles.tagBtn}
+                                    onClick={() => onTagClick(tag.name)}
+                                >
+                                    <span
+                                        className={styles.tagDot}
+                                        style={{ backgroundColor: tag.color }}
+                                    />
+                                    <span className={styles.navItemLabel}>
+                                        {tag.name}
+                                    </span>
                                     {tag.bookmarkCount > 0 && (
                                         <span className={styles.tagCount}>{tag.bookmarkCount}</span>
                                     )}
-                                </span>
-                            </button>
+                                </button>
+
+                                {/* boton eliminar, aparece en hover */}
+                                {onDeleteTag && (
+                                <button
+                                    className={styles.tagDeleteBtn}
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        onDeleteTag(tag.id, tag.name);
+                                    }}
+                                    title={`Eliminar etiqueta ${tag.name}`}
+                                    aria-label={`Eliminar etiqueta ${tag.name}`}
+                                >
+                                    <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+                                    close
+                                    </span>
+                                </button>
+                                )}
+                            </div>
                         ))
                     )}
                 </div>

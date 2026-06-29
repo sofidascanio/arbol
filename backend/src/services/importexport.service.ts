@@ -132,7 +132,7 @@ export const importFromNetscape = async (
             }
 
             // resuelve tags
-            const tagIds = await resolveTags(bm.tags ?? []);
+            const tagIds = await resolveTags(bm.tags ?? [], userId);
 
             // crea marcador
             await prisma.bookmark.create({
@@ -245,7 +245,7 @@ export const importFromJSON = async (
             const rawTags = Array.isArray(bm.tags)
                 ? bm.tags.map(String)
                 : [];
-            const tagIds = await resolveTags(rawTags);
+            const tagIds = await resolveTags(rawTags, userId);
 
             await prisma.bookmark.create({
                 data: {
@@ -318,14 +318,17 @@ const resolveFolder = async (
 };
 
 // resuelve o crea tags globales
-const resolveTags = async (tagNames: string[]): Promise<string[]> => {
+const resolveTags = async (
+    tagNames: string[],
+    userId: string        // ← agregar parámetro
+): Promise<string[]> => {
     const ids: string[] = [];
 
     for (const name of tagNames.map(t => t.toLowerCase().trim()).filter(Boolean)) {
         const tag = await prisma.tag.upsert({
-        where: { name },
-        update: {},
-        create: { name },
+            where: { name_userId: { name, userId } },
+            update: {},
+            create: { name, color: '#60a5fa', userId },
         });
         ids.push(tag.id);
     }

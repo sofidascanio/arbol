@@ -17,6 +17,7 @@ model User {
   // Relaciones
   bookmarks Bookmark[]
   folders   Folder[]
+  tags      Tag[]    
 
   @@map("users") // nombre real de la tabla en la BD
 }
@@ -48,6 +49,8 @@ model Bookmark {
   url         String
   description String?  // opcional
   isFavorite  Boolean  @default(false) 
+  faviconUrl  String? 
+  imageUrl    String?  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -66,12 +69,18 @@ model Bookmark {
 }
 
 model Tag {
-  id   String @id @default(cuid())
-  name String @unique // "design", "react", etc, sin duplicados globales
+  id    String @id @default(cuid())
+  name  String
+  color String @default("#60a5fa")
 
-  // Relación M:N con marcadores
+  // cada tag pertenece a un usuario
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   bookmarks BookmarkTag[]
 
+  // unico por usuario
+  @@unique([name, userId])
   @@map("tags")
 }
 

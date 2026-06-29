@@ -61,7 +61,7 @@ export const Register = () => {
                     <span className="material-symbols-outlined">bookmark</span>
                 </div>
                 <h1 className={styles.title}>Crear cuenta</h1>
-                <p className={styles.subtitle}>Empezá a organizar tu conocimiento</p>
+                <p className={styles.subtitle}>Empeza a organizar tus marcadores</p>
                 </div>
 
                 <div className={styles.divider} />
@@ -118,7 +118,7 @@ export const Register = () => {
                 <p className={styles.footer}>
                     ¿Ya tenes cuenta?{' '}
                     <Link to="/login" className={styles.link}>
-                        Ingresá
+                        Ingresar
                     </Link>
                 </p>
             </div>

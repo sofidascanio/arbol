@@ -23,16 +23,7 @@ interface InputModalProps {
     showColorPicker?: boolean;
 }
 
-const TAG_COLORS = [
-    '#60a5fa', 
-    '#4ade80',
-    '#fbbf24',
-    '#f87171',
-    '#c084fc',
-    '#fb923c',
-    '#34d399',
-    '#a78bfa',
-];
+
 
 export const InputModal = ({
     isOpen,
@@ -50,7 +41,7 @@ export const InputModal = ({
     showColorPicker = false,
 }: InputModalProps) => {
     const [value, setValue] = useState('');
-    const [selectedColor, setSelectedColor] = useState(TAG_COLORS[0]);
+    const [selectedColor, setSelectedColor] = useState('#60a5fa');
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -59,7 +50,7 @@ export const InputModal = ({
         if (isOpen) {
             setValue('');
             setError('');
-            setSelectedColor(TAG_COLORS[0]);
+            setSelectedColor('#60a5fa');
         }
     }, [isOpen]);
 
@@ -113,95 +104,96 @@ export const InputModal = ({
                     </Button>
                 </>
             }
-        >
-        <div className={styles.body}>
-            {/* descripcion opcional */}
-            {description && (
-                <p className={styles.description}>{description}</p>
-            )}
-
-            {/* carpeta padre, solo para subcarpetas */}
-            {parentName && (
-                <div className={styles.parentInfo}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
-                    folder
-                    </span>
-                    Dentro de: {parentName}
-                </div>
-            )}
-
-            {/* Input */}
-            <div className={styles.inputWrapper}>
-                <label className={styles.label}>{label}</label>
-                <input
-                    className={styles.input}
-                    type="text"
-                    placeholder={placeholder}
-                    value={value}
-                    onChange={e => {
-                        setValue(e.target.value);
-                        setError('');
-                    }}
-                    onKeyDown={handleKeyDown}
-                    autoFocus
-                    maxLength={100}
-                />
-                {error && <span className={styles.error}>{error}</span>}
-            </div>
-
-            {/* selector de color para etiquetas */}
-            {showColorPicker && (
-            <div className={styles.colorRow}>
-                <label className={styles.label}>Color</label>
-                <div className={styles.colorPicker}>
-                    {TAG_COLORS.map(color => (
-                        <button
-                            key={color}
-                            type="button"
-                            className={cn(
-                                styles.colorSwatch,
-                                selectedColor === color && styles.colorSwatchActive
-                            )}
-                            style={{ backgroundColor: color }}
-                            onClick={() => setSelectedColor(color)}
-                            aria-label={`Color ${color}`}
-                        />
-                    ))}
-                </div>
-            </div>
-            )}
-
-            {/* Preview */}
-            <div className={styles.preview}>
-                {previewIcon && (
-                    <span
-                        className={cn('material-symbols-outlined', styles.previewIcon)}
-                        style={showColorPicker ? { color: selectedColor } : undefined}
-                    >
-                    {previewIcon}
-                    </span>
+        >   
+            <div className={styles.body}>
+                {/* descripcion opcional */}
+                {description && (
+                    <p className={styles.description}>{description}</p>
                 )}
-                {showColorPicker && value && (
-                    <span
-                    style={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: '50%',
-                        backgroundColor: selectedColor,
-                        flexShrink: 0,
-                    }}
+
+                {/* carpeta padre, solo para subcarpetas */}
+                {parentName && (
+                    <div className={styles.parentInfo}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+                        folder
+                        </span>
+                        Dentro de: {parentName}
+                    </div>
+                )}
+
+                {/* Input */}
+                <div className={styles.inputWrapper}>
+                    <label className={styles.label}>{label}</label>
+                    <input
+                        className={styles.input}
+                        type="text"
+                        placeholder={placeholder}
+                        value={value}
+                        onChange={e => {
+                            setValue(e.target.value);
+                            setError('');
+                        }}
+                        onKeyDown={handleKeyDown}
+                        autoFocus
+                        maxLength={100}
                     />
+                    {error && <span className={styles.error}>{error}</span>}
+                </div>
+
+                {/* selector de color para etiquetas */}
+                {showColorPicker && (
+                <div className={styles.colorRow}>
+                    <label className={styles.label}>Color</label>
+                    <div className={styles.colorPickerRow}>
+                        <div className={styles.colorSwatchWrapper}>
+                            <div
+                                className={styles.colorPreviewSwatch}
+                                style={{ backgroundColor: selectedColor }}
+                            />
+                            <input
+                                type="color"
+                                className={styles.colorInput}
+                                value={selectedColor}
+                                onChange={e => setSelectedColor(e.target.value)}
+                                aria-label="Seleccionar color"
+                            />
+                        </div>
+                        <span className={styles.colorHex}>{selectedColor.toUpperCase()}</span>
+                    </div>
+                </div>
                 )}
-                <span
-                    className={cn(
-                        styles.previewLabel,
-                        !value.trim() && styles.previewLabelEmpty
+
+                {/* Preview */}
+                <div className={styles.preview}>
+                    {previewIcon && (
+                        <span
+                            className={cn('material-symbols-outlined', styles.previewIcon)}
+                            style={showColorPicker ? { color: selectedColor } : undefined}
+                        >
+                        {previewIcon}
+                        </span>
                     )}
-                >
-                    {value.trim() || placeholder}
-                </span>
+                    {showColorPicker && value && (
+                        <span
+                            style={{
+                                width: 10,
+                                height: 10,
+                                borderRadius: '50%',
+                                backgroundColor: selectedColor,
+                                flexShrink: 0,
+                            }}
+                        />
+                    )}
+                    <span
+                        className={cn(
+                            styles.previewLabel,
+                            !value.trim() && styles.previewLabelEmpty
+                        )}
+                    >
+                        {value.trim() || placeholder}
+                    </span>
+                </div>
             </div>
-        </div>
         </Modal>
     );
 };

@@ -1,6 +1,7 @@
 import { prisma } from '@/utils/prisma';
 import { AppError } from '@/middleware/errorHandler';
 import { PaginationParams, PaginatedResponse } from '@/types';
+import { fetchUrlMetadata } from '@/utils/metadata';
 
 // tipos locales 
 interface CreateBookmarkInput {
@@ -42,7 +43,10 @@ const validateUrl = (url: string): void => {
 
 // helper para resolver tags (crear si no existen)
 // dado un array de nombre de tags, devuelve los ids, crea los tags que no existan todavia
-const resolveTagIds = async (tagNames: string[]): Promise<string[]> => {
+const resolveTagIds = async (
+    tagNames: string[],
+    userId: string
+): Promise<string[]> => {
     const normalized = tagNames
         .map(t => t.toLowerCase().trim())
         .filter(t => t.length > 0);
@@ -51,9 +55,11 @@ const resolveTagIds = async (tagNames: string[]): Promise<string[]> => {
 
     for (const name of normalized) {
         const tag = await prisma.tag.upsert({
-            where: { name },
-            update: {},  // si existe, no cambia nada
-            create: { name }, // si no existe, crea
+            where: {
+                name_userId: { name, userId },  // unico por usuario
+            },
+            update: {},
+            create: { name, color: '#60a5fa', userId },
         });
         ids.push(tag.id);
     }
@@ -153,25 +159,28 @@ export const createBookmark = async (
 
     validateUrl(url);
 
-    // verifica que la carpeta pertenece al usuario
     if (folderId) {
         const folder = await prisma.folder.findFirst({
             where: { id: folderId, userId },
         });
-        if (!folder) {
-            throw new AppError('No se encontro la carpeta.', 404);
-        }
+        if (!folder) throw new AppError('Folder not found', 404);
     }
 
-    const tagIds = await resolveTagIds(tagNames);
+    // obtiene metadata en paralelo con la resolucion de tags
+    const [tagIds, metadata] = await Promise.all([
+        resolveTagIds(tagNames, userId),
+        fetchUrlMetadata(url),
+    ]);
 
     const bookmark = await prisma.bookmark.create({
         data: {
-            title,
+            title: title || metadata.title || new URL(url).hostname,
             url,
-            description,
+            description: description || metadata.description || null,
             userId,
             folderId: folderId || null,
+            faviconUrl: metadata.faviconUrl || null,
+            imageUrl: metadata.imageUrl || null,
             tags: {
                 create: tagIds.map(tagId => ({ tagId })),
             },
@@ -213,7 +222,7 @@ export const updateBookmark = async (
     // si se pasan tagNames, reemplaza todos los tags del bookmark
     let tagsUpdate = {};
     if (tagNames !== undefined) {
-        const tagIds = await resolveTagIds(tagNames);
+        const tagIds = await resolveTagIds(tagNames, userId);
         tagsUpdate = {
             tags: {
                 // borra todos los tags actuales y crea los nuevos
@@ -278,4 +287,28 @@ export const toggleFav = async (bookmarkId: string, userId: string) => {
         message,
         statusCode: 200 
     };
+};
+
+export const refreshBookmarkMetadata = async (
+    id: string,
+    userId: string
+) => {
+    const existing = await prisma.bookmark.findFirst({
+        where: { id, userId },
+    });
+
+    if (!existing) {
+        throw new AppError('Marcador no encontrado', 404);
+    }
+
+    const metadata = await fetchUrlMetadata(existing.url);
+
+    return prisma.bookmark.update({
+        where: { id },
+        data: {
+            faviconUrl: metadata.faviconUrl ?? undefined,
+            imageUrl: metadata.imageUrl ?? undefined,
+        },
+        include: bookmarkInclude,
+    });
 };

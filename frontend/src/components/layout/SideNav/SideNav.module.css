@@ -11,8 +11,7 @@
     z-index: 40;
     padding: 0 var(--space-md);
     transition: background-color var(--transition-normal);
-    overflow-x: clip;
-    overflow-y: visible;
+    overflow: clip;
 }
 
 /* cabecera  */
@@ -60,8 +59,7 @@
     color: var(--primary);
     line-height: var(--line-height-h3);
     white-space: nowrap;
-    overflow-x: clip;
-    overflow-y: visible;
+    overflow: clip;
     text-overflow: ellipsis;
 }
 
@@ -110,26 +108,12 @@
     flex-direction: column;
     gap: 2px;
     overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--outline-variant) transparent;
+    scrollbar-width: none;
     padding-right: 2px;
 }
 
 .nav::-webkit-scrollbar {
-    width: 3px;
-}
-
-.nav::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.nav::-webkit-scrollbar-thumb {
-    background: var(--outline-variant);
-    border-radius: 10px;
-}
-
-.nav::-webkit-scrollbar-thumb:hover {
-    background: var(--outline);
+    display: none;
 }
 
 .navItem {
@@ -179,8 +163,7 @@
 
 .navItemLabel {
     flex: 1;
-    overflow-x: clip;
-    overflow-y: visible;
+    overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -234,16 +217,14 @@
     font-size: 16px;
     flex-shrink: 0;
     border: 1px solid var(--outline-variant);
-    overflow-x: clip;
-    overflow-y: visible;
+    overflow: clip;
 }
 
 .userName {
     font-size: var(--font-size-label-md);
     color: var(--on-surface);
     font-weight: var(--font-weight-medium);
-    overflow-x: clip;
-    overflow-y: visible;
+    overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -309,8 +290,7 @@
 
 /* animacion del contenido colapsable */
 .sectionContent {
-    overflow-x: clip;
-    overflow-y: visible;
+    overflow: clip;
     transition: opacity var(--transition-fast);
 }
 
@@ -448,4 +428,98 @@
     margin-left: calc(var(--space-sm) + 7px);
     border-left: 1px solid var(--outline-variant);
     padding-left: 4px;
+}
+/* resize handle */
+.resizeHandle {
+    position: absolute;
+    top: 0;
+    right: -3px;
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 50;
+    background: transparent;
+    transition: background var(--transition-fast);
+}
+
+.resizeHandle:hover,
+.resizeHandle:active {
+    background: var(--primary);
+    opacity: 0.3;
+}
+
+/* tag row (contenedor del tag con boton eliminar)  */
+.tagRow {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-md);
+    gap: 2px;
+}
+
+.tagRow:hover {
+    background-color: var(--surface-container-high);
+}
+
+.navItemActive.tagRow {
+    background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
+    font-weight: var(--font-weight-semibold);
+}
+
+.navItemActive.tagRow:hover {
+    background-color: var(--secondary-container);
+}
+
+/* boton principal del tag */
+.tagBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    font-size: var(--font-size-body-md);
+    padding: var(--space-sm) var(--space-sm);
+    min-width: 0;
+    text-align: left;
+    border-radius: var(--radius-md);
+    color: var(--on-surface-variant);
+}
+
+.navItemActive .tagBtn {
+    color: var(--on-secondary-container);
+}
+
+/* boton × eliminar */
+.tagDeleteBtn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: none;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--on-surface-variant);
+    opacity: 0;
+    transition:
+        opacity var(--transition-fast),
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+    flex-shrink: 0;
+    margin-right: var(--space-xs);
+}
+
+.tagRow:hover .tagDeleteBtn {
+    opacity: 1;
+}
+
+.tagDeleteBtn:hover {
+    background-color: var(--error-container);
+    color: var(--on-error-container);
 }

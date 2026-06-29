@@ -25,7 +25,9 @@ export interface Bookmark {
     title: string;
     url: string;
     description: string | null;
-    isFavorite: boolean;    
+    isFavorite: boolean;
+    faviconUrl: string | null; 
+    imageUrl: string | null;
     folderId: string | null;
     folder: { id: string; name: string } | null;
     tags: { tag: Tag }[];

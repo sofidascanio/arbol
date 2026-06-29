@@ -46,8 +46,8 @@ export const Login = () => {
             <div className={styles.logo}>
                 <span className="material-symbols-outlined">bookmark</span>
             </div>
-            <h1 className={styles.title}>Bookmark Manager</h1>
-            <p className={styles.subtitle}>Ingresá a tu archivo de conocimiento</p>
+            <h1 className={styles.title}>Arbol</h1>
+            <p className={styles.subtitle}>Ingresa a tu archivo personal</p>
             </div>
 
             <div className={styles.divider} />
@@ -69,7 +69,7 @@ export const Login = () => {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 leftIcon={
-                <span className="material-symbols-outlined">mail</span>
+                    <span className="material-symbols-outlined">mail</span>
                 }
                 autoComplete="email"
                 autoFocus
@@ -82,7 +82,7 @@ export const Login = () => {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 leftIcon={
-                <span className="material-symbols-outlined">lock</span>
+                    <span className="material-symbols-outlined">lock</span>
                 }
                 autoComplete="current-password"
             />
@@ -98,7 +98,7 @@ export const Login = () => {
             </form>
 
             <p className={styles.footer}>
-            ¿No tenés cuenta?{' '}
+            ¿No tenes cuenta?{' '}
             <Link to="/register" className={styles.link}>
                 Registrate
             </Link>

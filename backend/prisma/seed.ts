@@ -32,16 +32,16 @@ async function main(): Promise<void> {
     console.info(`Created users: ${alex.email}, ${sara.email}`);
 
     const tags = await Promise.all([
-        prisma.tag.create({ data: { name: 'design' } }),
-        prisma.tag.create({ data: { name: 'ux' } }),
-        prisma.tag.create({ data: { name: 'engineering' } }),
-        prisma.tag.create({ data: { name: 'architecture' } }),
-        prisma.tag.create({ data: { name: 'inspiration' } }),
-        prisma.tag.create({ data: { name: 'resources' } }),
-        prisma.tag.create({ data: { name: 'typography' } }),
-        prisma.tag.create({ data: { name: '3d' } }),
-        prisma.tag.create({ data: { name: 'ai' } }),
-        prisma.tag.create({ data: { name: 'personal' } }),
+        prisma.tag.create({ data: { name: 'design',        color: '#60a5fa', userId: alex.id } }),
+        prisma.tag.create({ data: { name: 'ux',            color: '#4ade80', userId: alex.id } }),
+        prisma.tag.create({ data: { name: 'engineering',   color: '#fbbf24', userId: alex.id } }),
+        prisma.tag.create({ data: { name: 'architecture',  color: '#f87171', userId: alex.id } }),
+        prisma.tag.create({ data: { name: 'inspiration',   color: '#c084fc', userId: alex.id } }),
+        prisma.tag.create({ data: { name: 'resources',     color: '#fb923c', userId: alex.id } }),
+        prisma.tag.create({ data: { name: 'typography',    color: '#34d399', userId: alex.id } }),
+        prisma.tag.create({ data: { name: '3d',            color: '#a78bfa', userId: alex.id } }),
+        prisma.tag.create({ data: { name: 'ai',            color: '#60a5fa', userId: alex.id } }),
+        prisma.tag.create({ data: { name: 'personal',      color: '#4ade80', userId: alex.id } }),
     ]);
 
     // helper para buscar tag por nombre

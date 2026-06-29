@@ -8,6 +8,7 @@ interface UseTagsReturn {
     fetchTags: () => Promise<void>;
     addTagToBookmark: (bookmarkId: string, tagNames: string[]) => Promise<void>;
     removeTagFromBookmark: (bookmarkId: string, tagName: string) => Promise<void>;
+    deleteTag: (tagId: string) => Promise<void>;
 }
 
 export const useTags = (): UseTagsReturn => {
@@ -48,6 +49,14 @@ export const useTags = (): UseTagsReturn => {
         [fetchTags]
     );
 
+    const deleteTag = useCallback(
+        async (tagId: string) => {
+            await tagService.deleteTag(tagId);
+            await fetchTags();
+        },
+        [fetchTags]
+    );
+
     return {
         tags,
         isLoading,
@@ -55,5 +64,6 @@ export const useTags = (): UseTagsReturn => {
         fetchTags,
         addTagToBookmark,
         removeTagFromBookmark,
+        deleteTag,
     };
 };

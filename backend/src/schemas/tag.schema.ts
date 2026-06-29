@@ -8,7 +8,7 @@ export const getPopularSchema = [
 ];
 
 export const addTagsSchema = [
-    param('bookmarkId').notEmpty().withMessage('ID de marcador requerido'),
+    param('bookmarkId').notEmpty().withMessage('ID de marcador obligatorio'),
     body('tagNames')
         .isArray({ min: 1 })
         .withMessage('Se requiere al menos una etiqueta'),
@@ -20,6 +20,26 @@ export const addTagsSchema = [
 ];
 
 export const removeTagSchema = [
-    param('bookmarkId').notEmpty().withMessage('ID de marcador requerido'),
-    param('tagName').notEmpty().withMessage('Nombre de etiqueta requerido'),
+    param('bookmarkId').notEmpty().withMessage('ID de marcador obligatorio'),
+    param('tagName').notEmpty().withMessage('Nombre de etiqueta obligatorio'),
 ];
+
+export const updateColorSchema = [
+    param('tagId').notEmpty().withMessage('ID de etiqueta obligatorio'),
+    body('color')
+        .matches(/^#[0-9a-fA-F]{6}$/)
+        .withMessage('Color debe ser un hex válido (#rrggbb)'),
+]
+
+export const createTagSchema = [
+    body('name')
+        .trim()
+        .notEmpty()
+        .withMessage('El nombre es obligatorio')
+        .isLength({ max: 50 })
+        .withMessage('Máximo 50 caracteres'),
+    body('color')
+        .optional()
+        .matches(/^#[0-9a-fA-F]{6}$/)
+        .withMessage('Color debe ser un hex válido (#rrggbb)'),
+]

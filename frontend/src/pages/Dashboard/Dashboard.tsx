@@ -9,8 +9,10 @@ import { useFolders } from '@/hooks/useFolders';
 import { useTags } from '@/hooks/useTags';
 import { InputModal } from '@/components/ui/InputModal/InputModal';
 import { useToastContext } from '@/context/ToastContext';
-import { folderService } from '@/services/folder.service';
+// import { folderService } from '@/services/folder.service';
+import { tagService } from '@/services/tag.service';
 import styles from './Dashboard.module.css';
+
 
 interface DashboardProps {
     children?: React.ReactNode;
@@ -86,11 +88,15 @@ export const Dashboard = ({ children }: DashboardProps) => {
         );
     }, [createFolder, fetchFolders, folderModal, toast]);
 
-    const handleCreateTag = useCallback(async (name: string) => {
-        // las tags se crean cuando se asignan al marcador
-        // guarda el nombre en el estado para pre-rellenar el modal del marcador
-        toast.info(`Etiqueta "${name}" lista. Asignala al crear un marcador.`);
-    }, [toast]);
+    const handleCreateTag = useCallback(async (name: string, color?: string) => {
+        try {
+            await tagService.createTag(name, color ?? '#60a5fa');
+            await fetchTags(); // refresca el listado del sidebar
+            toast.success(`Etiqueta "${name}" creada`);
+        } catch {
+            toast.error('No se pudo crear la etiqueta');
+        }
+    }, [fetchTags, toast]);
 
 
     const handleAddNew = useCallback(() => {
@@ -102,6 +108,21 @@ export const Dashboard = ({ children }: DashboardProps) => {
         setRefreshKey(k => k + 1);
         fetchFolders();
     }, [fetchFolders]);
+
+    const handleDeleteTag = useCallback(async (tagId: string, tagName: string) => {
+        if (!confirm(`¿Eliminar la etiqueta "${tagName}"?\nSe quitará de todos tus marcadores.`)) return;
+        try {
+            await tagService.deleteTag(tagId);
+            await fetchTags();
+            // si el tag eliminado era el activo, limpia el filtro
+            if (activeTagName === tagName) {
+                setActiveTagName(undefined);
+            }
+            toast.success(`Etiqueta "${tagName}" eliminada`);
+        } catch {
+            toast.error('No se pudo eliminar la etiqueta');
+        }
+    }, [fetchTags, activeTagName, toast]);
 
     return (
         <div className={styles.layout}>
@@ -116,6 +137,7 @@ export const Dashboard = ({ children }: DashboardProps) => {
                 onNewTag={handleNewTag}
                 onNewSubfolder={handleNewSubfolder}
                 onClearActive={handleClearActive}
+                onDeleteTag={handleDeleteTag}
             />
 
             <div className={styles.main}>

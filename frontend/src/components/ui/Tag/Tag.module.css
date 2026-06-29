@@ -40,3 +40,14 @@
 .clickable:hover {
     opacity: 0.8;
 }
+
+.custom {
+    border: 1px solid transparent;
+}
+
+.colorDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}

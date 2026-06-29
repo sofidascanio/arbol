@@ -7,7 +7,8 @@ import {
   createBookmark,
   updateBookmark,
   deleteBookmark,
-  toggleFav
+  toggleFav,
+  refreshBookmarkMetadata
 } from '@/services/bookmark.service';
 
 // lista de bookmarks del usuario autenticado, con filtros y paginacion
@@ -115,6 +116,22 @@ export const toggleFavorite = async (
         }
 
         sendSuccess(res, { bookmark: result.data.bookmark }, result.message);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const refreshMetadata = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const updated = await refreshBookmarkMetadata(
+            req.params.id,
+            req.user!.id
+        );
+        sendSuccess(res, { bookmark: updated }, 'Metadata actualizada');
     } catch (error) {
         next(error);
     }

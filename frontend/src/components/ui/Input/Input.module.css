@@ -51,7 +51,7 @@
 
 /* con icono izquierdo */
 .hasLeftIcon {
-    padding-left: calc(var(--space-md) + 20px + var(--space-xs));
+    padding-left: calc(var(--space-md) + 20px + var(--space-sm));
 }
 
 .leftIcon {

@@ -7,6 +7,9 @@ import {
   addTagsToBookmark,
   removeTagFromBookmark,
   getBookmarkTags,
+  updateTagColor,
+  createTag, 
+  deleteTag
 } from '@/services/tag.service';
 
 // lista todos los tags del usuario
@@ -84,6 +87,50 @@ export const removeTag = async (
             req.params.tagName
         );
         sendSuccess(res, null, 'Etiqueta eliminada correctamente');
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateColor = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { color } = req.body as { color: string };
+        const tag = await updateTagColor(req.params.tagId, req.user!.id, color);
+        sendSuccess(res, { tag }, 'Color actualizado');
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const create = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { name, color = '#60a5fa' } = req.body as {
+            name: string;
+            color?: string;
+        };
+        const tag = await createTag(req.user!.id, name, color);
+        sendSuccess(res, { tag }, 'Etiqueta creada', 201);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const remove = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        await deleteTag(req.params.tagId, req.user!.id);
+        sendSuccess(res, null, 'Etiqueta eliminada');
     } catch (error) {
         next(error);
     }
