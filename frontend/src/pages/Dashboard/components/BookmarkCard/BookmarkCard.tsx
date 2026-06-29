@@ -7,7 +7,8 @@ import styles from './BookmarkCard.module.css';
 interface BookmarkCardProps {
     bookmark: Bookmark;
     onDelete?: (id: string) => void;
-    onFavoriteToggle?: (id: string, isFavorite: boolean) => void;     
+    onFavoriteToggle?: (id: string, isFavorite: boolean) => void;  
+    onEdit?: (bookmark: Bookmark) => void;    
     className?: string;
 }
 
@@ -40,6 +41,7 @@ export const BookmarkCard = ({
     bookmark,
     onDelete,
     onFavoriteToggle,
+    onEdit,
     className,
 }: BookmarkCardProps) => {
     const [imageError, setImageError] = useState(false);
@@ -81,7 +83,7 @@ export const BookmarkCard = ({
         onKeyDown={e => e.key === 'Enter' && handleOpen()}
         aria-label={`Abrir ${bookmark.title}`}
         >
-            {/* ─── Imagen / Preview ──────────────────────────────────────────── */}
+            {/* imagen/preview  */}
             <div className={styles.imageWrapper}>
                 {showImagePreview ? (
                 <img
@@ -106,56 +108,68 @@ export const BookmarkCard = ({
                     </span>
                 </div>
                 ) : (
-                /* Fallback genérico si todo falla */
+                /* fallback generico si todo falla */
                 <div className={styles.imagePlaceholder}>
                     <span className="material-symbols-outlined">language</span>
                 </div>
                 )}
 
-                {/* Acciones flotantes */}
+                {/* acciones flotantes */}
                 <div className={styles.actions}>
-                <button
-                    className={styles.actionBtn}
-                    onClick={handleFavorite}
-                    title={bookmark.isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-                >
-                    <span
-                    className="material-symbols-outlined"
-                    style={{
-                        fontSize: 18,
-                        fontVariationSettings: bookmark.isFavorite ? "'FILL' 1" : "'FILL' 0",
-                        color: bookmark.isFavorite ? '#fbbf24' : undefined,
-                    }}
-                    >
-                    star
-                    </span>
-                </button>
-
-                <button
-                    className={styles.actionBtn}
-                    onClick={e => { e.stopPropagation(); handleOpen(); }}
-                    title="Abrir enlace"
-                >
-                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-                    open_in_new
-                    </span>
-                </button>
-
-                {onDelete && (
                     <button
-                    className={styles.actionBtn}
-                    onClick={handleDelete}
-                    title="Eliminar"
+                        className={styles.actionBtn}
+                        onClick={handleFavorite}
+                        title={bookmark.isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                     >
-                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-                        delete
-                    </span>
+                        <span
+                        className="material-symbols-outlined"
+                        style={{
+                            fontSize: 18,
+                            fontVariationSettings: bookmark.isFavorite ? "'FILL' 1" : "'FILL' 0",
+                            color: bookmark.isFavorite ? '#fbbf24' : undefined,
+                        }}
+                        >
+                        star
+                        </span>
                     </button>
-                )}
+
+                    <button
+                        className={styles.actionBtn}
+                        onClick={e => { e.stopPropagation(); handleOpen(); }}
+                        title="Abrir enlace"
+                    >
+                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                        open_in_new
+                        </span>
+                    </button>
+
+                    {onEdit && (
+                        <button
+                        className={styles.actionBtn}
+                        onClick={e => { e.stopPropagation(); onEdit(bookmark); }}
+                        title="Editar"
+                        >
+                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                            edit
+                        </span>
+                        </button>
+                    )}
+
+                    {onDelete && (
+                        <button
+                        className={styles.actionBtn}
+                        onClick={handleDelete}
+                        title="Eliminar"
+                        >
+                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                            delete
+                        </span>
+                        </button>
+                    )}
                 </div>
             </div>
 
-            {/* ─── Cuerpo ────────────────────────────────────────────────────── */}
+            {/* cuerpo  */}
             <div className={styles.body}>
                 {bookmark.tags.length > 0 && (
                 <div className={styles.tagRow}>

@@ -10,6 +10,8 @@ import { useTags } from '@/hooks/useTags';
 import { InputModal } from '@/components/ui/InputModal/InputModal';
 import { useToastContext } from '@/context/ToastContext';
 // import { folderService } from '@/services/folder.service';
+import { EditBookmarkModal } from './components/EditBookmarkModal/EditBookmarkModal';
+import { Bookmark } from '@/types';
 import { tagService } from '@/services/tag.service';
 import styles from './Dashboard.module.css';
 
@@ -25,6 +27,8 @@ export const Dashboard = ({ children }: DashboardProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
     const deferredSearch = useDeferredValue(searchQuery);
+
+    const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
 
     const toast = useToastContext();
 
@@ -73,6 +77,16 @@ export const Dashboard = ({ children }: DashboardProps) => {
 
     const handleNewTag = useCallback(() => {
         setTagModal(true);
+    }, []);
+
+    // handler para abrir modal de edicion
+    const handleEdit = useCallback((bookmark: Bookmark) => {
+        setEditingBookmark(bookmark);
+    }, []);
+
+    // handler de exito, para refrescar la vista
+    const handleEditSuccess = useCallback(() => {
+        setRefreshKey(k => k + 1);
     }, []);
 
     const handleCreateFolder = useCallback(async (name: string) => {
@@ -159,6 +173,7 @@ export const Dashboard = ({ children }: DashboardProps) => {
                                     activeFolderId={activeFolderId}
                                     activeTagName={activeTagName}
                                     onAddNew={handleAddNew}
+                                    onEdit={handleEdit} 
                                 />
                             )}
                             {viewMode === 'list' && (
@@ -188,6 +203,14 @@ export const Dashboard = ({ children }: DashboardProps) => {
                 onClose={() => setIsModalOpen(false)}
                 folders={folders}
                 onSuccess={handleModalSuccess}
+            />
+
+            <EditBookmarkModal
+                isOpen={editingBookmark !== null}
+                onClose={() => setEditingBookmark(null)}
+                bookmark={editingBookmark}
+                folders={folders}
+                onSuccess={handleEditSuccess}
             />
 
             {/* modal nueva carpeta/subcarpeta  */}

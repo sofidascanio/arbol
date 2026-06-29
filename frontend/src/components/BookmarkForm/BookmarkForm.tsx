@@ -17,6 +17,7 @@ interface BookmarkFormProps {
     folders: Folder[];
     onSubmit: (values: BookmarkFormValues) => Promise<void>;
     isSubmitting: boolean;
+    isEditing?: boolean;
 }
 
 const TAG_SUGGESTIONS = [
@@ -40,6 +41,7 @@ export const BookmarkForm = ({
     folders,
     onSubmit,
     isSubmitting,
+    isEditing = false,
 }: BookmarkFormProps) => {
     const [url, setUrl] = useState(initialValues.url ?? '');
     const [title, setTitle] = useState(initialValues.title ?? '');

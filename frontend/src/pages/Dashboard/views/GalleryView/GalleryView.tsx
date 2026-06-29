@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { BookmarkCard } from '../../components/BookmarkCard/BookmarkCard';
+import { Bookmark } from '@/types';
 import { cn } from '@/utils/cn';
 import styles from './GalleryView.module.css';
 
@@ -10,6 +11,7 @@ interface GalleryViewProps {
     activeTagName?: string;
     onAddNew: () => void;
     favoritesOnly?: boolean; 
+    onEdit?: (bookmark: Bookmark) => void;
 }
 
 export const GalleryView = ({
@@ -18,6 +20,7 @@ export const GalleryView = ({
     activeTagName,
     onAddNew,
     favoritesOnly, 
+    onEdit,
 }: GalleryViewProps) => {
     const [activeTag, setActiveTag] = useState('');
     const { bookmarks, total, isLoading, fetchBookmarks, deleteBookmark, handleFavoriteToggle } = useBookmarks();
@@ -163,6 +166,7 @@ export const GalleryView = ({
                             bookmark={bookmark}
                             onDelete={handleDelete}
                             onFavoriteToggle={handleFavoriteToggle}
+                            onEdit={onEdit}
                         />
                     ))}
 
