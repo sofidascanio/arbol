@@ -19,4 +19,6 @@ export const tagService = {
         ),
     createTag: (name: string, color: string) => api.post<{ tag: { id: string; name: string; color: string } }>('/tags', {name, color, }),
     deleteTag: (tagId: string) => api.delete<null>(`/tags/${tagId}`),
+    renameTag: (tagId: string, name: string) =>
+        api.patch<{ tag: { id: string; name: string; color: string } }>(`/tags/${tagId}/name`, { name }),
 };

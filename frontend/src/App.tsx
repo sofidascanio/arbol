@@ -7,6 +7,7 @@ import { Dashboard } from '@/pages/Dashboard/Dashboard';
 import { ToastProvider } from '@/context/ToastContext';
 import { ImportExport } from '@/pages/ImportExport/ImportExport';
 import { Favorites } from '@/pages/Favorites/Favorites';
+import { Settings } from '@/pages/Settings/Settings';
 import '@/styles/global.css';
 import '@/styles/typography.css';
 
@@ -70,6 +71,16 @@ const AppRoutes = () => {
 					<ProtectedRoute>
 					<Dashboard>
 						<Favorites />
+					</Dashboard>
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/settings"
+				element={
+					<ProtectedRoute>
+					<Dashboard>
+						<Settings />
 					</Dashboard>
 					</ProtectedRoute>
 				}

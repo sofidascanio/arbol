@@ -9,7 +9,8 @@ import {
   getBookmarkTags,
   updateTagColor,
   createTag, 
-  deleteTag
+  deleteTag,
+  renameTag
 } from '@/services/tag.service';
 
 // lista todos los tags del usuario
@@ -131,6 +132,16 @@ export const remove = async (
     try {
         await deleteTag(req.params.tagId, req.user!.id);
         sendSuccess(res, null, 'Etiqueta eliminada');
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const rename = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const { name } = req.body as { name: string };
+        const tag = await renameTag(req.params.tagId, req.user!.id, name);
+        sendSuccess(res, { tag }, 'Etiqueta renombrada');
     } catch (error) {
         next(error);
     }

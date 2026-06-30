@@ -43,3 +43,11 @@ export const createTagSchema = [
         .matches(/^#[0-9a-fA-F]{6}$/)
         .withMessage('Color debe ser un hex válido (#rrggbb)'),
 ]
+
+export const renameTagSchema = [
+    body('name')
+        .trim()
+        .notEmpty()
+        .withMessage('El nombre es obligatorio')
+        .isLength({ max: 50 }),
+]

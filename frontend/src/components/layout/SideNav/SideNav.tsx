@@ -252,29 +252,46 @@ export const SideNav = ({
 
             {/* footer */}
             <div className={styles.footer}>
-                <NavLink
-                    to="/import-export"
-                    className={({ isActive }) =>
-                        cn(styles.navItem, isActive && styles.navItemActive)
-                    }
+                <div className={styles.iconRow}>
+                    <NavLink
+                        to="/import-export"
+                        className={({ isActive }) =>
+                            cn(styles.iconBtn, isActive && styles.iconBtnActive)
+                        }
+                        title="Importar / Exportar"
                     >
-                    <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
-                        import_export
-                    </span>
-                    <span className={styles.navItemLabel}>Importar / Exportar</span>
-                </NavLink>
+                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                            import_export
+                        </span>
+                    </NavLink>
 
-                <button className={styles.navItem} onClick={logout}>
-                    <span className={cn('material-symbols-outlined', styles.navItemIcon)}>
-                        logout
-                    </span>
-                    <span className={styles.navItemLabel}>Cerrar sesión</span>
-                </button>
+                    <NavLink
+                        to="/settings"
+                        className={({ isActive }) =>
+                            cn(styles.iconBtn, isActive && styles.iconBtnActive)
+                        }
+                        title="Configuración"
+                    >
+                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                            settings
+                        </span>
+                    </NavLink>
+
+                    <button
+                        className={styles.iconBtn}
+                        onClick={logout}
+                        title="Cerrar sesión"
+                    >
+                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                            logout
+                        </span>
+                    </button>
+                </div>
 
                 <div className={styles.userInfo}>
                     <div className={styles.avatar}>
                         <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-                        person
+                            person
                         </span>
                     </div>
                     <span className={styles.userName}>{user?.email}</span>

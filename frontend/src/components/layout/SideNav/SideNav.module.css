@@ -523,3 +523,40 @@
     background-color: var(--error-container);
     color: var(--on-error-container);
 }
+
+/* ─── Fila de íconos del footer ──────────────────────────────────────────── */
+
+.iconRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    padding: var(--space-xs) 0;
+}
+
+.iconBtn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    border: none;
+    background: none;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.iconBtn:hover {
+    background-color: var(--surface-container-high);
+    color: var(--on-surface);
+}
+
+.iconBtnActive {
+    background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
+}

@@ -21,6 +21,8 @@ interface InputModalProps {
     parentName?: string;
     // para etiquetas, mostrar selector de color
     showColorPicker?: boolean;
+    initialValue?: string;
+    initialColor?: string; 
 }
 
 
@@ -39,6 +41,8 @@ export const InputModal = ({
     previewIcon,
     parentName,
     showColorPicker = false,
+    initialValue = '', 
+    initialColor,       
 }: InputModalProps) => {
     const [value, setValue] = useState('');
     const [selectedColor, setSelectedColor] = useState('#60a5fa');
@@ -48,11 +52,11 @@ export const InputModal = ({
     // limpia al abrir
     useEffect(() => {
         if (isOpen) {
-            setValue('');
+            setValue(initialValue);
             setError('');
-            setSelectedColor('#60a5fa');
+            setSelectedColor(initialColor ?? '#60a5fa');
         }
-    }, [isOpen]);
+    }, [isOpen, initialValue, initialColor]);
 
     const handleConfirm = async () => {
         if (!value.trim()) {

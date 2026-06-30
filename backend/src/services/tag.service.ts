@@ -194,3 +194,28 @@ export const removeTagFromBookmark = async (
         where: { bookmarkId_tagId: { bookmarkId, tagId: tag.id } },
     });
 };
+
+export const renameTag = async (
+    tagId: string,
+    userId: string,
+    newName: string
+): Promise<{ id: string; name: string; color: string }> => {
+    const tag = await prisma.tag.findFirst({ where: { id: tagId, userId } });
+    if (!tag) throw new AppError('Etiqueta no encontrada', 404);
+
+    const normalized = newName.toLowerCase().trim();
+
+    // verifica que no choque con otro tag del mismo usuario
+    const existing = await prisma.tag.findUnique({
+        where: { name_userId: { name: normalized, userId } },
+    });
+    if (existing && existing.id !== tagId) {
+        throw new AppError('Ya tenés una etiqueta con ese nombre', 409);
+    }
+
+    return prisma.tag.update({
+        where: { id: tagId },
+        data: { name: normalized },
+        select: { id: true, name: true, color: true },
+    });
+};

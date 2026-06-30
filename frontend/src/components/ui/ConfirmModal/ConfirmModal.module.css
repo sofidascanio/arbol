@@ -1,0 +1,29 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.message {
+    font-size: var(--font-size-body-md);
+    color: var(--on-surface);
+    line-height: var(--line-height-body-md);
+}
+
+.warningBox {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--error-container);
+    color: var(--on-error-container);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+}
+
+.warningIcon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
