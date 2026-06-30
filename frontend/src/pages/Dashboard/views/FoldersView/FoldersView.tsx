@@ -169,7 +169,7 @@ export const FoldersView = ({ searchQuery, onAddNew, onEdit }: FoldersViewProps)
                     <p className={styles.subtitle}>
                         {currentFolder
                             ? `Contenido de la carpeta ${currentFolder.name}`
-                            : 'Colección curada de referencias visuales, patrones de UI y recursos creativos.'}
+                            : ''}
                     </p>
                 </div>
 

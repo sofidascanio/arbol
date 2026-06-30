@@ -4,57 +4,13 @@
     gap: var(--space-lg);
 }
 
-/* campo url con boton fetch  */
-.urlRow {
-    display: flex;
-    gap: var(--space-sm);
-    align-items: flex-end;
-}
-
-.urlInput {
-    flex: 1;
-}
-
-.fetchBtn {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    padding: var(--space-sm) var(--space-md);
-    background-color: var(--surface-container-high);
-    color: var(--on-surface);
-    border: none;
-    border-radius: var(--radius-md);
-    font-family: var(--font-family);
+/* label generico  */
+.fieldLabel {
+    display: block;
     font-size: var(--font-size-label-md);
     font-weight: var(--font-weight-medium);
-    cursor: pointer;
-    white-space: nowrap;
-    height: 40px;
-    transition:
-        background-color var(--transition-fast),
-        opacity var(--transition-fast);
-    flex-shrink: 0;
-}
-
-.fetchBtn:hover {
-    background-color: var(--surface-variant);
-}
-
-.fetchBtn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.fetchBtnDone {
-    background-color: var(--secondary-container);
-    color: var(--on-secondary-container);
-}
-
-/* fila de organizacion */
-.orgRow {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-sm);
+    color: var(--on-surface-variant);
+    margin-bottom: var(--space-xs);
 }
 
 /* selector de carpeta */
@@ -91,125 +47,37 @@
     pointer-events: none;
 }
 
-.selectLabel {
-    display: block;
-    font-size: var(--font-size-label-md);
-    font-weight: var(--font-weight-medium);
-    color: var(--on-surface-variant);
-    margin-bottom: var(--space-xs);
-}
-
-/* area de tags  */
-.tagsLabel {
-    display: block;
-    font-size: var(--font-size-label-md);
-    font-weight: var(--font-weight-medium);
-    color: var(--on-surface-variant);
-    margin-bottom: var(--space-xs);
-}
-
-.tagsArea {
-    min-height: 80px;
-    background-color: var(--surface-container-low);
-    border: 1px solid var(--outline-variant);
-    border-radius: var(--radius-md);
-    padding: var(--space-sm);
+/* preview de la carpeta seleccionada */
+.folderPreview {
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
-    gap: var(--space-xs);
-    align-content: flex-start;
-    cursor: text;
-    transition: border-color var(--transition-fast);
+    gap: 4px;
+    margin-top: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--surface-container-low);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--outline-variant);
 }
 
-.tagsArea:focus-within {
-    border-color: var(--primary);
-}
-
-.tagChip {
-    display: inline-flex;
+.folderPreviewSegment {
+    display: flex;
     align-items: center;
     gap: 4px;
-    padding: 2px var(--space-sm);
-    background-color: var(--secondary-container);
-    color: var(--on-secondary-container);
-    border-radius: var(--radius-full);
-    font-size: var(--font-size-label-sm);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: var(--letter-spacing-label-sm);
 }
 
-.tagRemove {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: inherit;
-    padding: 0;
-    font-size: 14px;
-    line-height: 1;
-    opacity: 0.7;
-    transition: opacity var(--transition-fast);
-}
-
-.tagRemove:hover {
-    opacity: 1;
-}
-
-.tagInput {
-    flex: 1;
-    min-width: 120px;
-    border: none;
-    background: transparent;
-    outline: none;
-    font-family: var(--font-family);
-    font-size: var(--font-size-label-sm);
-    color: var(--on-surface);
-    padding: 2px var(--space-xs);
-}
-
-.tagInput::placeholder {
-    color: var(--on-surface-variant);
-    opacity: 0.5;
-}
-
-/* sugerencias de tags  */
-.tagSuggestions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-xs);
-    margin-top: var(--space-xs);
-}
-
-.tagSugLabel {
+.folderPreviewParent {
     font-size: var(--font-size-caption);
     color: var(--on-surface-variant);
-    opacity: 0.6;
 }
 
-.tagSugChip {
-    background: none;
-    border: none;
-    font-family: var(--font-family);
-    font-size: var(--font-size-label-sm);
-    color: var(--on-surface-variant);
-    cursor: pointer;
-    padding: 2px var(--space-sm);
-    border-radius: var(--radius-md);
-    transition:
-        background-color var(--transition-fast),
-        color var(--transition-fast);
-}
-
-.tagSugChip:hover {
-    background-color: var(--surface-container-high);
+.folderPreviewCurrent {
+    font-size: var(--font-size-caption);
     color: var(--primary);
+    font-weight: var(--font-weight-semibold);
 }
 
-/* textarea descripcion  */
+/* textarea descripcion */
 .textarea {
     width: 100%;
     background-color: var(--surface-container-low);
@@ -222,7 +90,7 @@
     line-height: var(--line-height-body-md);
     outline: none;
     resize: vertical;
-    min-height: 88px;
+    min-height: 80px;
     transition: border-color var(--transition-fast);
 }
 
@@ -233,4 +101,135 @@
 
 .textarea:focus {
     border-color: var(--primary);
+}
+
+/* tags seleccionadas  */
+.selectedTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+}
+
+.tagChipSelected {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px var(--space-sm);
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    font-family: var(--font-family);
+    font-size: var(--font-size-label-sm);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-label-sm);
+    cursor: pointer;
+    transition:
+        opacity var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.tagChipSelected:hover {
+    opacity: 0.75;
+    transform: scale(0.97);
+}
+
+/* input de nueva etiqueta  */
+.tagInputWrapper {
+    background-color: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--space-xs) var(--space-sm);
+    transition: border-color var(--transition-fast);
+}
+
+.tagInputWrapper:focus-within {
+    border-color: var(--primary);
+}
+
+.tagInput {
+    width: 100%;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: var(--font-family);
+    font-size: var(--font-size-body-md);
+    color: var(--on-surface);
+    padding: var(--space-xs) 0;
+}
+
+.tagInput::placeholder {
+    color: var(--on-surface-variant);
+    opacity: 0.5;
+}
+
+/* tags disponibles del usuario  */
+.availableTags {
+    margin-top: var(--space-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.availableTagsLabel {
+    font-size: var(--font-size-caption);
+    color: var(--on-surface-variant);
+    opacity: 0.7;
+}
+
+.availableTagsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.tagChipAvailable {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px var(--space-sm);
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    font-family: var(--font-family);
+    font-size: var(--font-size-label-sm);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-label-sm);
+    cursor: pointer;
+    transition:
+        opacity var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.tagChipAvailable:hover {
+    opacity: 0.8;
+    transform: scale(1.03);
+}
+
+/* punto de color  */
+.tagDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* contador en tag disponible  */
+.tagBadge {
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 0 4px;
+    border-radius: var(--radius-full);
+    line-height: 1.6;
+}
+
+/* error global  */
+.globalError {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--error-container);
+    color: var(--on-error-container);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-body-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
 }
