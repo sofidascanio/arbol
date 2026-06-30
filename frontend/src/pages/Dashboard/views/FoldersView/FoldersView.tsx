@@ -1,7 +1,7 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useFolders } from '@/hooks/useFolders';
 import { useBookmarks } from '@/hooks/useBookmarks';
-import { Folder } from '@/types';
+import { Folder, Bookmark } from '@/types';
 import { BookmarkCard } from '../../components/BookmarkCard/BookmarkCard';
 import { InputModal } from '@/components/ui/InputModal/InputModal';
 import { cn } from '@/utils/cn';
@@ -12,16 +12,17 @@ import styles from './FoldersView.module.css';
 interface FoldersViewProps {
     searchQuery: string;
     onAddNew: () => void;
+    onEdit?: (bookmark: Bookmark) => void;
 }
 
-export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
+export const FoldersView = ({ searchQuery, onAddNew, onEdit }: FoldersViewProps) => {
     const { folders, isLoading: foldersLoading, createFolder, fetchFolders } = useFolders();
-    const { bookmarks, isLoading: bookmarksLoading, fetchBookmarks } = useBookmarks();
+    const { bookmarks, isLoading: bookmarksLoading, fetchBookmarks, deleteBookmark, handleFavoriteToggle } = useBookmarks();
 
     const [activeFilter, setActiveFilter] = useState('');
     const [activeFolderPath, setActiveFolderPath] = useState<Folder[]>([]);
 
-    // Estado del modal de nueva subcarpeta
+    // estado del modal de nueva subcarpeta
     const [folderModal, setFolderModal] = useState(false);
 
     const currentFolder = activeFolderPath[activeFolderPath.length - 1];
@@ -98,6 +99,18 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
     const handleTagFilter = (tagName: string) => {
         setActiveFilter(prev => (prev === tagName ? '' : tagName));
     };
+
+    const handleDeleteBookmark = useCallback(
+        async (id: string) => {
+            if (!confirm('¿Eliminar este marcador?')) return;
+            try {
+                await deleteBookmark(id);
+            } catch {
+                toast.error('No se pudo eliminar el marcador');
+            }
+        },
+        [deleteBookmark]
+    );
 
     const handleDeleteFolder = async () => {
         if (!currentFolder) return;
@@ -291,7 +304,13 @@ export const FoldersView = ({ searchQuery, onAddNew }: FoldersViewProps) => {
                     )}
 
                     {filteredBookmarks.map(bookmark => (
-                        <BookmarkCard key={bookmark.id} bookmark={bookmark} />
+                        <BookmarkCard
+                            key={bookmark.id}
+                            bookmark={bookmark}
+                            onDelete={handleDeleteBookmark}
+                            onFavoriteToggle={handleFavoriteToggle}
+                            onEdit={onEdit}
+                        />
                     ))}
                 </div>
             )}

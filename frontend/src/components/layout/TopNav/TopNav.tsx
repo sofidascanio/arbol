@@ -13,6 +13,8 @@ interface TopNavProps {
     onSearch: (query: string) => void;
     searchValue: string;
     onAddNew: () => void;
+    hideViewTabs?: boolean;
+    hideSearch?: boolean; 
 }
 
 const VIEW_TABS: { key: ViewMode; label: string }[] = [
@@ -27,6 +29,8 @@ export const TopNav = ({
     onSearch,
     searchValue,
     onAddNew,
+    hideViewTabs = false,
+    hideSearch = false, 
 }: TopNavProps) => {
     const { themeDefinition, openPanel } = useTheme();
     const searchRef = useRef<HTMLInputElement>(null);
@@ -46,36 +50,40 @@ export const TopNav = ({
         <>
         <header className={styles.topnav}>
             {/* busqueda */}
-            <div className={styles.searchWrapper}>
-                <span className={cn('material-symbols-outlined', styles.searchIcon)}>
-                    search
-                </span>
-                <input
-                    ref={searchRef}
-                    className={styles.searchInput}
-                    placeholder="Buscar en tu archivo..."
-                    value={searchValue}
-                    onChange={e => onSearch(e.target.value)}
-                    type="text"
-                />
-                <span className={styles.searchKbd}>⌘K</span>
-            </div>
+            {!hideSearch && (
+                <div className={styles.searchWrapper}>
+                    <span className={cn('material-symbols-outlined', styles.searchIcon)}>
+                        search
+                    </span>
+                    <input
+                        ref={searchRef}
+                        className={styles.searchInput}
+                        placeholder="Buscar en tu archivo..."
+                        value={searchValue}
+                        onChange={e => onSearch(e.target.value)}
+                        type="text"
+                    />
+                    <span className={styles.searchKbd}>⌘K</span>
+                </div>
+            )}
 
             {/* tabs de vista  */}
-            <nav className={styles.viewTabs}>
-                {VIEW_TABS.map(tab => (
-                    <button
-                        key={tab.key}
-                        className={cn(
-                            styles.viewTab,
-                            viewMode === tab.key && styles.viewTabActive
-                        )}
-                        onClick={() => onViewChange(tab.key)}
-                    >
-                    {tab.label}
-                    </button>
-                ))}
-            </nav>
+            {!hideViewTabs && (
+                <nav className={styles.viewTabs}>
+                    {VIEW_TABS.map(tab => (
+                        <button
+                            key={tab.key}
+                            className={cn(
+                                styles.viewTab,
+                                viewMode === tab.key && styles.viewTabActive
+                            )}
+                            onClick={() => onViewChange(tab.key)}
+                        >
+                        {tab.label}
+                        </button>
+                    ))}
+                </nav>
+            )}
 
             {/* acciones  */}
             <div className={styles.actions}>

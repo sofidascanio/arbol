@@ -8,6 +8,7 @@ export interface User {
 export interface Tag {
     id: string;
     name: string;
+    color: string;
 }
 
 export interface Folder {
@@ -30,7 +31,7 @@ export interface Bookmark {
     imageUrl: string | null;
     folderId: string | null;
     folder: { id: string; name: string } | null;
-    tags: { tag: Tag }[];
+    tags: { tag: { id: string; name: string; color: string } }[];
     createdAt: string;
     updatedAt: string;
 }

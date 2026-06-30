@@ -76,7 +76,7 @@ const bookmarkInclude = {
     tags: {
         include: {
             tag: {
-                select: { id: true, name: true },
+                select: { id: true, name: true, color: true },
             },
         },
     },

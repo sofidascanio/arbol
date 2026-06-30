@@ -1,7 +1,12 @@
 import { useState, useCallback, useDeferredValue } from 'react';
 import { GalleryView } from '@/pages/Dashboard/views/GalleryView/GalleryView';
 import { ListView } from '@/pages/Dashboard/views/ListView/ListView';
-import { TopNav, ViewMode } from '@/components/layout/TopNav/TopNav';
+import { ViewMode } from '@/components/layout/TopNav/TopNav';
+import { EditBookmarkModal } from '@/pages/Dashboard/components/EditBookmarkModal/EditBookmarkModal';
+import { useFolders } from '@/hooks/useFolders';
+import { useToastContext } from '@/context/ToastContext';
+import { bookmarkService } from '@/services/bookmark.service';
+import { Bookmark } from '@/types';
 import styles from './Favorites.module.css';
 
 export const Favorites = () => {
@@ -9,12 +14,34 @@ export const Favorites = () => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const deferredSearch = useDeferredValue(searchQuery);
 	const [refreshKey, setRefreshKey] = useState(0);
+	const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
+
+	const { folders } = useFolders();
+	const toast = useToastContext();
 
 	const handleSearch = useCallback((q: string) => setSearchQuery(q), []);
 	const handleAddNew = useCallback(() => {
-		// por ahora navega al dashboard
 		window.location.href = '/';
 	}, []);
+
+	const handleEdit = useCallback((bookmark: Bookmark) => {
+		setEditingBookmark(bookmark);
+	}, []);
+
+	const handleEditSuccess = useCallback(() => {
+		setRefreshKey(k => k + 1);
+	}, []);
+
+	const handleDelete = useCallback(async (id: string) => {
+		if (!confirm('¿Eliminar este marcador?')) return;
+		try {
+			await bookmarkService.delete(id);
+			setRefreshKey(k => k + 1);
+			toast.success('Marcador eliminado');
+		} catch {
+			toast.error('No se pudo eliminar el marcador');
+		}
+	}, [toast]);
 
 	return (
 		<div className={styles.wrapper}>
@@ -81,6 +108,7 @@ export const Favorites = () => {
 						key={`fav-gallery-${refreshKey}`}
 						searchQuery={deferredSearch}
 						onAddNew={handleAddNew}
+						onEdit={handleEdit}
 						favoritesOnly
 					/>
 				)}
@@ -89,10 +117,20 @@ export const Favorites = () => {
 						key={`fav-list-${refreshKey}`}
 						searchQuery={deferredSearch}
 						onAddNew={handleAddNew}
+						onEdit={handleEdit}
+						onDelete={handleDelete}
 						favoritesOnly
 					/>
 				)}
 			</div>
+
+			<EditBookmarkModal
+				isOpen={editingBookmark !== null}
+				onClose={() => setEditingBookmark(null)}
+				bookmark={editingBookmark}
+				folders={folders}
+				onSuccess={handleEditSuccess}
+			/>
 		</div>
 	);
 };

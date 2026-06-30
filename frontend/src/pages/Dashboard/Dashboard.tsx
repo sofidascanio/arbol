@@ -9,7 +9,7 @@ import { useFolders } from '@/hooks/useFolders';
 import { useTags } from '@/hooks/useTags';
 import { InputModal } from '@/components/ui/InputModal/InputModal';
 import { useToastContext } from '@/context/ToastContext';
-// import { folderService } from '@/services/folder.service';
+import { bookmarkService } from '@/services/bookmark.service';
 import { EditBookmarkModal } from './components/EditBookmarkModal/EditBookmarkModal';
 import { Bookmark } from '@/types';
 import { tagService } from '@/services/tag.service';
@@ -138,6 +138,17 @@ export const Dashboard = ({ children }: DashboardProps) => {
         }
     }, [fetchTags, activeTagName, toast]);
 
+    const handleDeleteFromList = useCallback(async (id: string) => {
+        if (!confirm('¿Eliminar este marcador?')) return;
+        try {
+            await bookmarkService.delete(id);
+            setRefreshKey(k => k + 1);
+            toast.success('Marcador eliminado');
+        } catch {
+            toast.error('No se pudo eliminar el marcador');
+        }
+    }, [toast]);
+
     return (
         <div className={styles.layout}>
             <SideNav
@@ -161,6 +172,8 @@ export const Dashboard = ({ children }: DashboardProps) => {
                     onSearch={handleSearch}
                     searchValue={searchQuery}
                     onAddNew={handleAddNew}
+                    hideViewTabs={!!children}
+                    hideSearch={!!children} 
                 />
 
                 <main className={styles.content}>
@@ -183,6 +196,8 @@ export const Dashboard = ({ children }: DashboardProps) => {
                                     activeFolderId={activeFolderId}
                                     activeTagName={activeTagName}
                                     onAddNew={handleAddNew}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDeleteFromList}
                                 />
                             )}
                             {viewMode === 'folders' && (
@@ -190,6 +205,7 @@ export const Dashboard = ({ children }: DashboardProps) => {
                                     key={`folders-${refreshKey}`}
                                     searchQuery={deferredSearch}
                                     onAddNew={handleAddNew}
+                                    onEdit={handleEdit}
                                 />
                             )}
                         </>
