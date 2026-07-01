@@ -3,6 +3,7 @@ import { useBookmarks } from '@/hooks/useBookmarks';
 import { BookmarkCard } from '../../components/BookmarkCard/BookmarkCard';
 import { Bookmark } from '@/types';
 import { cn } from '@/utils/cn';
+import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal';
 import styles from './GalleryView.module.css';
 
 interface GalleryViewProps {
@@ -12,6 +13,7 @@ interface GalleryViewProps {
     onAddNew: () => void;
     favoritesOnly?: boolean; 
     onEdit?: (bookmark: Bookmark) => void;
+    hideAddNew?: boolean; 
 }
 
 export const GalleryView = ({
@@ -21,9 +23,13 @@ export const GalleryView = ({
     onAddNew,
     favoritesOnly, 
     onEdit,
+    hideAddNew = false, 
 }: GalleryViewProps) => {
     const [activeTag, setActiveTag] = useState('');
     const { bookmarks, total, isLoading, fetchBookmarks, deleteBookmark, handleFavoriteToggle } = useBookmarks();
+
+    // estado del modal de confirmacion: eliminar marcador
+    const [bookmarkToDelete, setBookmarkToDelete] = useState<string | null>(null);
 
     // re-fetch cuando cambia carpeta, busqueda o tag del sidebar
     useEffect(() => {
@@ -66,17 +72,18 @@ export const GalleryView = ({
         );
     }, [bookmarks, activeTag]);
 
-    const handleDelete = useCallback(
-        async (id: string) => {
-            if (!confirm('¿Eliminar este marcador?')) return;
-            try {
-                await deleteBookmark(id);
-            } catch {
-                alert('No se pudo eliminar el marcador');
-            }
-        },
-        [deleteBookmark]
-    );
+    const handleDelete = useCallback((id: string) => {
+        setBookmarkToDelete(id);
+    }, []);
+
+    const confirmDelete = useCallback(async () => {
+        if (!bookmarkToDelete) return;
+        try {
+            await deleteBookmark(bookmarkToDelete);
+        } catch {
+            alert('No se pudo eliminar el marcador');
+        }
+    }, [bookmarkToDelete, deleteBookmark]);
 
     const handleTagFilter = (tagName: string) => {
         // click en el tag activo lo deselecciona
@@ -171,17 +178,29 @@ export const GalleryView = ({
                     ))}
 
                     {/* tarjeta para agregar nuevo */}
-                    <button className={styles.addCard} onClick={onAddNew}>
-                        <div className={styles.addCardIcon}>
-                            <span className="material-symbols-outlined">add_link</span>
-                        </div>
-                        <span className={styles.addCardLabel}>Agregar marcador</span>
-                        <span className={styles.addCardSub}>
-                            Pega un enlace o agregalo manualmente
-                        </span>
-                    </button>
+                    {!hideAddNew && (
+                        <button className={styles.addCard} onClick={onAddNew}>
+                            <div className={styles.addCardIcon}>
+                                <span className="material-symbols-outlined">add_link</span>
+                            </div>
+                            <span className={styles.addCardLabel}>Agregar marcador</span>
+                            <span className={styles.addCardSub}>
+                                Pega un enlace o agregalo manualmente
+                            </span>
+                        </button>
+                    )}
                 </div>
             )}
+
+            {/* modal eliminar marcador */}
+            <ConfirmModal
+                isOpen={!!bookmarkToDelete}
+                onClose={() => setBookmarkToDelete(null)}
+                onConfirm={confirmDelete}
+                title="Eliminar marcador"
+                message="¿Eliminar este marcador?"
+                confirmLabel="Eliminar"
+            />
         </div>
     );
 };

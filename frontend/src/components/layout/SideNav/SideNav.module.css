@@ -12,6 +12,7 @@
     padding: 0 var(--space-md);
     transition: background-color var(--transition-normal);
     overflow: clip;
+    min-width: var(--sidebar-width);
 }
 
 /* cabecera  */
@@ -524,8 +525,7 @@
     color: var(--on-error-container);
 }
 
-/* ─── Fila de íconos del footer ──────────────────────────────────────────── */
-
+/* fila de iconos del footer  */
 .iconRow {
     display: flex;
     align-items: center;

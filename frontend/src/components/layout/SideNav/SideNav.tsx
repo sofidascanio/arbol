@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Folder } from '@/types';
 import { cn } from '@/utils/cn';
 import { Tag } from '@/services/tag.service';
+import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal';
 import styles from './SideNav.module.css';
 
 interface SideNavProps {
@@ -39,9 +40,13 @@ export const SideNav = ({
     const [foldersOpen, setFoldersOpen] = useState(true);
     const [tagsOpen, setTagsOpen] = useState(true);
 
-    const MIN_WIDTH = 180;
+    // estado del modal de confirmacion: eliminar etiqueta
+    const [tagToDelete, setTagToDelete] = useState<{ id: string; name: string } | null>(null);
+
+    const DEFAULT_WIDTH = 240; // ancho original del sidebar
+    const MIN_WIDTH = DEFAULT_WIDTH; // no permite achicar por debajo del ancho original
     const MAX_WIDTH = 480;
-    const [sidebarWidth, setSidebarWidth] = useState(240);
+    const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_WIDTH);
     const isResizing = useRef(false);
 
     const handleResizeStart = useCallback((e: React.MouseEvent) => {
@@ -234,7 +239,7 @@ export const SideNav = ({
                                     className={styles.tagDeleteBtn}
                                     onClick={e => {
                                         e.stopPropagation();
-                                        onDeleteTag(tag.id, tag.name);
+                                        setTagToDelete({ id: tag.id, name: tag.name });
                                     }}
                                     title={`Eliminar etiqueta ${tag.name}`}
                                     aria-label={`Eliminar etiqueta ${tag.name}`}
@@ -297,6 +302,19 @@ export const SideNav = ({
                     <span className={styles.userName}>{user?.email}</span>
                 </div>
             </div>
+
+            {/* modal eliminar etiqueta */}
+            <ConfirmModal
+                isOpen={!!tagToDelete}
+                onClose={() => setTagToDelete(null)}
+                onConfirm={() => {
+                    if (tagToDelete) onDeleteTag?.(tagToDelete.id, tagToDelete.name);
+                }}
+                title="Eliminar etiqueta"
+                message={`¿Eliminar la etiqueta "${tagToDelete?.name}"?`}
+                warning="Se quitara de todos los marcadores que la tengan asignada."
+                confirmLabel="Eliminar"
+            />
         </aside>
     );
 };

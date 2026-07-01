@@ -4,6 +4,7 @@ import { useBookmarks } from '@/hooks/useBookmarks';
 import { Folder, Bookmark } from '@/types';
 import { BookmarkCard } from '../../components/BookmarkCard/BookmarkCard';
 import { InputModal } from '@/components/ui/InputModal/InputModal';
+import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal';
 import { cn } from '@/utils/cn';
 import { folderService } from '@/services/folder.service';
 import { useToastContext } from '@/context/ToastContext';
@@ -20,10 +21,43 @@ export const FoldersView = ({ searchQuery, onAddNew, onEdit }: FoldersViewProps)
     const { bookmarks, isLoading: bookmarksLoading, fetchBookmarks, deleteBookmark, handleFavoriteToggle } = useBookmarks();
 
     const [activeFilter, setActiveFilter] = useState('');
-    const [activeFolderPath, setActiveFolderPath] = useState<Folder[]>([]);
+    // guarda solo los ids del path, los folders se resuelven contra el 
+    // arbol actualizado en cada render para no quedar con datos viejos
+    const [activeFolderIds, setActiveFolderIds] = useState<string[]>([]);
 
     // estado del modal de nueva subcarpeta
     const [folderModal, setFolderModal] = useState(false);
+
+    // estado del modal de confirmacion: eliminar marcador
+    const [bookmarkToDelete, setBookmarkToDelete] = useState<string | null>(null);
+
+    // estado del modal de confirmacion: eliminar carpeta actual
+    const [deleteFolderModal, setDeleteFolderModal] = useState(false);
+
+    // busca un folder por id recorriendo el arbol (recursivo)
+    const findFolderById = useCallback((nodes: Folder[], id: string): Folder | undefined => {
+        for (const node of nodes) {
+            if (node.id === id) return node;
+            if (node.children?.length) {
+                const found = findFolderById(node.children, id);
+                if (found) return found;
+            }
+        }
+        return undefined;
+    }, []);
+
+    // resuelve path de ids contra el arbol "folders" actual, asi refleja los datos mas reciente (incluyendo children)
+    const activeFolderPath = useMemo(() => {
+        const path: Folder[] = [];
+        let currentLevel = folders;
+        for (const id of activeFolderIds) {
+            const found = findFolderById(currentLevel, id);
+            if (!found) break;
+            path.push(found);
+            currentLevel = found.children ?? [];
+        }
+        return path;
+    }, [folders, activeFolderIds, findFolderById]);
 
     const currentFolder = activeFolderPath[activeFolderPath.length - 1];
     const currentFolderChildren = currentFolder?.children ?? folders;
@@ -77,15 +111,15 @@ export const FoldersView = ({ searchQuery, onAddNew, onEdit }: FoldersViewProps)
     }, [bookmarks, activeFilter]);
 
     const handleFolderClick = (folder: Folder) => {
-        setActiveFolderPath(prev => [...prev, folder]);
+        setActiveFolderIds(prev => [...prev, folder.id]);
     };
 
     const handleBreadcrumbClick = (index: number) => {
-        setActiveFolderPath(prev => prev.slice(0, index + 1));
+        setActiveFolderIds(prev => prev.slice(0, index + 1));
     };
 
     const handleRootClick = () => {
-        setActiveFolderPath([]);
+        setActiveFolderIds([]);
     };
 
     const handleCreateSubfolder = async (name: string) => {
@@ -100,31 +134,31 @@ export const FoldersView = ({ searchQuery, onAddNew, onEdit }: FoldersViewProps)
         setActiveFilter(prev => (prev === tagName ? '' : tagName));
     };
 
-    const handleDeleteBookmark = useCallback(
-        async (id: string) => {
-            if (!confirm('¿Eliminar este marcador?')) return;
-            try {
-                await deleteBookmark(id);
-            } catch {
-                toast.error('No se pudo eliminar el marcador');
-            }
-        },
-        [deleteBookmark]
-    );
+    const handleDeleteBookmark = useCallback((id: string) => {
+        setBookmarkToDelete(id);
+    }, []);
 
-    const handleDeleteFolder = async () => {
+    const confirmDeleteBookmark = useCallback(async () => {
+        if (!bookmarkToDelete) return;
+        try {
+            await deleteBookmark(bookmarkToDelete);
+        } catch {
+            toast.error('No se pudo eliminar el marcador');
+        }
+    }, [bookmarkToDelete, deleteBookmark]);
+
+    const handleDeleteFolder = () => {
         if (!currentFolder) return;
+        setDeleteFolderModal(true);
+    };
 
-        const confirmed = window.confirm(
-            `¿Eliminar la carpeta "${currentFolder.name}"?\n\nLos marcadores dentro quedarán sin carpeta.`
-        );
-        if (!confirmed) return;
-
+    const confirmDeleteFolder = async () => {
+        if (!currentFolder) return;
         try {
             await folderService.delete(currentFolder.id);
             await fetchFolders();
             // vuelve al nivel anterior en el breadcrumb
-            setActiveFolderPath(prev => prev.slice(0, -1));
+            setActiveFolderIds(prev => prev.slice(0, -1));
             toast.success(`Carpeta "${currentFolder.name}" eliminada`);
         } catch {
             toast.error('No se pudo eliminar la carpeta');
@@ -332,6 +366,27 @@ export const FoldersView = ({ searchQuery, onAddNew, onEdit }: FoldersViewProps)
                 confirmLabel="Crear carpeta"
                 previewIcon="folder"
                 parentName={currentFolder?.name}
+            />
+
+            {/* modal eliminar marcador */}
+            <ConfirmModal
+                isOpen={!!bookmarkToDelete}
+                onClose={() => setBookmarkToDelete(null)}
+                onConfirm={confirmDeleteBookmark}
+                title="Eliminar marcador"
+                message="¿Eliminar este marcador?"
+                confirmLabel="Eliminar"
+            />
+
+            {/* modal eliminar carpeta */}
+            <ConfirmModal
+                isOpen={deleteFolderModal}
+                onClose={() => setDeleteFolderModal(false)}
+                onConfirm={confirmDeleteFolder}
+                title="Eliminar carpeta"
+                message={`¿Eliminar la carpeta "${currentFolder?.name}"?`}
+                warning="Los marcadores dentro quedarán sin carpeta."
+                confirmLabel="Eliminar carpeta"
             />
         </div>
     );

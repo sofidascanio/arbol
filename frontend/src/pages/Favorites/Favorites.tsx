@@ -110,6 +110,7 @@ export const Favorites = () => {
 						onAddNew={handleAddNew}
 						onEdit={handleEdit}
 						favoritesOnly
+						hideAddNew
 					/>
 				)}
 				{viewMode === 'list' && (
@@ -120,6 +121,7 @@ export const Favorites = () => {
 						onEdit={handleEdit}
 						onDelete={handleDelete}
 						favoritesOnly
+						hideAddNew
 					/>
 				)}
 			</div>

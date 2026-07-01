@@ -61,15 +61,15 @@
     --surface-variant:  #e6e2e0;
     --surface-tint:     #615e57;
 
-    --space-xs:            4px;
-    --space-sm:            8px;
-    --space-md:            16px;
-    --space-lg:            24px;
-    --space-xl:            40px;
-    --space-xxl:           64px;
-    --sidebar-width:       240px;
-    --container-max:       1200px;
-    --topnav-height:       64px;
+    --space-xs:        4px;
+    --space-sm:        8px;
+    --space-md:       16px;
+    --space-lg:       24px;
+    --space-xl:       40px;
+    --space-xxl:      64px;
+    --sidebar-width:  250px;
+    --container-max:  1200px;
+    --topnav-height:  64px;
 
     --radius-sm:   2px;
     --radius-md:   4px;

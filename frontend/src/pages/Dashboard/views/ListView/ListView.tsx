@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { Bookmark } from '@/types';
 import { Tag } from '@/components/ui/Tag/Tag';
 import { cn } from '@/utils/cn';
 import { bookmarkService } from '@/services/bookmark.service';
+import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal';
 import styles from './ListView.module.css';
 
 interface ListViewProps {
@@ -14,6 +15,7 @@ interface ListViewProps {
     favoritesOnly?: boolean;
     onEdit?: (bookmark: Bookmark) => void;
     onDelete?: (id: string) => void;
+    hideAddNew?: boolean;
 }
 
 const getDomain = (url: string): string => {
@@ -53,8 +55,12 @@ export const ListView = ({
     favoritesOnly,
     onEdit,
     onDelete,
+    hideAddNew = false,
 }: ListViewProps) => {
     const { bookmarks, total, isLoading, fetchBookmarks, handleFavoriteToggle } = useBookmarks();
+
+    // estado del modal de confirmacion: eliminar marcador
+    const [bookmarkToDelete, setBookmarkToDelete] = useState<string | null>(null);
 
     useEffect(() => {
         fetchBookmarks({
@@ -208,7 +214,7 @@ export const ListView = ({
                                                     className={cn(styles.actionBtn, styles.actionBtnDanger)}
                                                     onClick={e => {
                                                         e.stopPropagation();
-                                                        onDelete(bookmark.id);
+                                                        setBookmarkToDelete(bookmark.id);
                                                     }}
                                                     title="Eliminar"
                                                 >
@@ -242,13 +248,13 @@ export const ListView = ({
                         })}
 
                         {/* fila agregar nuevo */}
-                        <button className={styles.addRow} onClick={onAddNew}>
-                            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-                                add
-                            </span>
-                            <span>Nuevo marcador...</span>
-                        </button>
-                </>
+                        {!hideAddNew && (
+                            <button className={styles.addRow} onClick={onAddNew}>
+                                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+                                <span>Nuevo marcador...</span>
+                            </button>
+                        )}
+                    </>
                 )}
             </div>
 
@@ -266,6 +272,18 @@ export const ListView = ({
                     <span>En la nube</span>
                 </div>
             </div>
+
+            {/* modal eliminar marcador */}
+            <ConfirmModal
+                isOpen={!!bookmarkToDelete}
+                onClose={() => setBookmarkToDelete(null)}
+                onConfirm={() => {
+                    if (bookmarkToDelete) onDelete?.(bookmarkToDelete);
+                }}
+                title="Eliminar marcador"
+                message="¿Eliminar este marcador?"
+                confirmLabel="Eliminar"
+            />
         </div>
     );
 };
