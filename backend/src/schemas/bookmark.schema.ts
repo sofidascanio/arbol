@@ -12,6 +12,14 @@ export const listSchema = [
     query('search').optional().trim().isLength({ max: 200 }),
     query('folderId').optional().isString(),
     query('tag').optional().trim().isLength({ max: 50 }),
+    query('sortBy')
+        .optional()
+        .isIn(['createdAt', 'title'])
+        .withMessage('sortBy debe ser createdAt o title'),
+        query('sortDir')
+        .optional()
+        .isIn(['asc', 'desc'])
+        .withMessage('sortDir debe ser asc o desc'),
 ];
 
 export const createSchema = [

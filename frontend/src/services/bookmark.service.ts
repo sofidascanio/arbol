@@ -8,6 +8,8 @@ export interface ListBookmarksParams {
     folderId?: string;
     tag?: string;
     favoritesOnly?: boolean;
+    sortBy?: 'createdAt' | 'title'; 
+    sortDir?: 'asc' | 'desc'; 
 }
 
 export interface CreateBookmarkInput {
@@ -35,6 +37,8 @@ export const bookmarkService = {
         if (params.folderId) query.set('folderId', params.folderId);
         if (params.tag) query.set('tag', params.tag);
         if (params.favoritesOnly) query.set('favoritesOnly', 'true');
+        if (params.sortBy) query.set('sortBy', params.sortBy);
+        if (params.sortDir) query.set('sortDir', params.sortDir);
         return api.get<{ items: Bookmark[]; total: number; page: number; limit: number; totalPages: number }>(
             `/bookmarks?${query.toString()}`
         );

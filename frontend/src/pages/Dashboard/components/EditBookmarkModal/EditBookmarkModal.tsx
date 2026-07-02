@@ -53,7 +53,7 @@ export const EditBookmarkModal = ({
             isOpen={isOpen}
             onClose={onClose}
             title="Editar marcador"
-            subtitle="Modifica los datos del marcador"
+            subtitle=""
             icon="edit"
             footer={
                 <>

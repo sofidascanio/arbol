@@ -3,6 +3,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { ThemePanel } from '@/components/ui/ThemePanel/ThemePanel';
 import { Button } from '@/components/ui/Button/Button';
 import { cn } from '@/utils/cn';
+import { SortState } from '@/types/sort';
 import styles from './TopNav.module.css';
 
 export type ViewMode = 'gallery' | 'list' | 'folders';
@@ -15,6 +16,8 @@ interface TopNavProps {
     onAddNew: () => void;
     hideViewTabs?: boolean;
     hideSearch?: boolean; 
+    onSortChange?: (sort: SortState) => void;
+    sortState?: SortState;   
 }
 
 const VIEW_TABS: { key: ViewMode; label: string }[] = [
@@ -31,6 +34,8 @@ export const TopNav = ({
     onAddNew,
     hideViewTabs = false,
     hideSearch = false, 
+    onSortChange,
+    sortState,
 }: TopNavProps) => {
     const { themeDefinition, openPanel } = useTheme();
     const searchRef = useRef<HTMLInputElement>(null);
@@ -87,12 +92,84 @@ export const TopNav = ({
 
             {/* acciones  */}
             <div className={styles.actions}>
-                <button className={styles.iconBtn} title="Filtrar">
-                    <span className="material-symbols-outlined">filter_list</span>
-                </button>
-                <button className={styles.iconBtn} title="Ordenar">
-                    <span className="material-symbols-outlined">sort</span>
-                </button>
+                {onSortChange && sortState && (
+                    <>
+                        {/* ordenar por nombre */}
+                        <button
+                            className={cn(
+                                styles.iconBtn,
+                                sortState.sortBy === 'title' && styles.iconBtnActive
+                            )}
+                            onClick={() => {
+                                if (sortState.sortBy === 'title') {
+                                    // toggle dirección
+                                    onSortChange({
+                                        sortBy: 'title',
+                                        sortDir: sortState.sortDir === 'asc' ? 'desc' : 'asc',
+                                    });
+                                } else {
+                                    onSortChange({ sortBy: 'title', sortDir: 'asc' });
+                                }
+                            }}
+                            title={
+                                sortState.sortBy === 'title'
+                                ? sortState.sortDir === 'asc'
+                                    ? 'Nombre: A → Z (click para invertir)'
+                                    : 'Nombre: Z → A (click para invertir)'
+                                : 'Ordenar por nombre'
+                            }
+                        >
+                            <span className="material-symbols-outlined">
+                                {sortState.sortBy === 'title'
+                                    ? sortState.sortDir === 'asc'
+                                        ? 'sort_by_alpha'
+                                        : 'sort_by_alpha'
+                                    : 'sort_by_alpha'}
+                            </span>
+                            {sortState.sortBy === 'title' && (
+                                <span className={styles.sortDirIndicator}>
+                                    {sortState.sortDir === 'asc' ? '' : ''}
+                                </span>
+                            )}
+                        </button>
+
+                        {/* ordenar por fecha */}
+                        <button
+                            className={cn(
+                                styles.iconBtn,
+                                sortState.sortBy === 'createdAt' && styles.iconBtnActive
+                            )}
+                            onClick={() => {
+                                if (sortState.sortBy === 'createdAt') {
+                                    onSortChange({
+                                        sortBy: 'createdAt',
+                                        sortDir: sortState.sortDir === 'desc' ? 'asc' : 'desc',
+                                    });
+                                } else {
+                                    onSortChange({ sortBy: 'createdAt', sortDir: 'desc' });
+                                }
+                            }}
+                            title={
+                                sortState.sortBy === 'createdAt'
+                                ? sortState.sortDir === 'desc'
+                                    ? 'Más recientes primero (click para invertir)'
+                                    : 'Más antiguos primero (click para invertir)'
+                                : 'Ordenar por fecha'
+                            }
+                        >
+                        <span className="material-symbols-outlined">
+                            {sortState.sortBy === 'createdAt' && sortState.sortDir === 'asc'
+                            ? 'clock_arrow_down'
+                            : 'clock_arrow_up'}
+                        </span>
+                        {sortState.sortBy === 'createdAt' && (
+                            <span className={styles.sortDirIndicator}>
+                                {sortState.sortDir === 'desc' ? '' : ''}
+                            </span>
+                        )}
+                        </button>
+                    </>
+                )}
 
                 <div className={styles.divider} />
 

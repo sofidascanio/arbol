@@ -90,9 +90,9 @@ export const Settings = () => {
         try {
             await folderService.update(editingFolderId, { name });
             await fetchFolders();
-            toast.success('Carpeta renombrada');
+            toast.success('Carpeta actualizada.');
         } catch {
-            toast.error('No se pudo renombrar la carpeta');
+            toast.error('No se pudo actualizar la carpeta');
         } finally {
             setEditingFolderId(null);
         }
@@ -119,8 +119,8 @@ export const Settings = () => {
     // carpetas: eliminar 
     const handleOpenDeleteFolder = (folder: FlatFolder) => {
         const warning = folder.childCount > 0
-            ? `Esta carpeta tiene ${folder.childCount} subcarpeta(s). Se eliminarán también. Los marcadores quedarán sin carpeta.`
-            : 'Los marcadores dentro de esta carpeta quedarán sin carpeta.';
+            ? `Esta carpeta tiene ${folder.childCount} subcarpeta(s). Se eliminaran también. Los marcadores quedan sin carpeta.`
+            : 'Los marcadores dentro de esta carpeta quedan sin carpeta.';
 
         setDeleteModal({
             isOpen: true,
@@ -163,7 +163,7 @@ export const Settings = () => {
             type: 'tag',
             id: tagId,
             name: tagName,
-            warning: 'Se quitará de todos tus marcadores.',
+            warning: 'Se quitara de todos tus marcadores.',
         });
     };
 
@@ -203,7 +203,7 @@ export const Settings = () => {
                         <div>
                             <div className={styles.sectionTitle}>Carpetas</div>
                             <div className={styles.sectionSub}>
-                            {flatFolders.length} {flatFolders.length === 1 ? 'carpeta' : 'carpetas'}
+                                {flatFolders.length} {flatFolders.length === 1 ? 'carpeta' : 'carpetas'}
                             </div>
                         </div>
                         </div>
@@ -354,7 +354,7 @@ export const Settings = () => {
                 subtitle={
                 folderModal.parentId
                     ? `Dentro de "${folderModal.parentName}"`
-                    : 'Organizá tus marcadores'
+                    : ''
                 }
                 icon="create_new_folder"
                 label="Nombre de la carpeta"
@@ -369,7 +369,7 @@ export const Settings = () => {
                 onClose={() => setNewTagModal(false)}
                 onConfirm={handleCreateTag}
                 title="Nueva etiqueta"
-                subtitle="Las etiquetas ayudan a clasificar tus marcadores"
+                subtitle=""
                 icon="sell"
                 label="Nombre de la etiqueta"
                 placeholder="Ej: diseño, frontend, inspiración..."

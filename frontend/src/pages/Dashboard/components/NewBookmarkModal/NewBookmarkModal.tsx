@@ -46,7 +46,7 @@ export const NewBookmarkModal = ({
         <Modal isOpen={isOpen}
                 onClose={onClose}
                 title="Agregar marcador"
-                subtitle="Guarda un nuevo enlace en tu archivo"
+                subtitle=""
                 icon="add_link"
                 footer={
                     <>

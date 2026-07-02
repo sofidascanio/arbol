@@ -4,6 +4,7 @@ import { BookmarkCard } from '../../components/BookmarkCard/BookmarkCard';
 import { Bookmark } from '@/types';
 import { cn } from '@/utils/cn';
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal';
+import { SortState } from '@/types/sort';
 import styles from './GalleryView.module.css';
 
 interface GalleryViewProps {
@@ -14,6 +15,7 @@ interface GalleryViewProps {
     favoritesOnly?: boolean; 
     onEdit?: (bookmark: Bookmark) => void;
     hideAddNew?: boolean; 
+    sortState?: SortState;
 }
 
 export const GalleryView = ({
@@ -24,6 +26,7 @@ export const GalleryView = ({
     favoritesOnly, 
     onEdit,
     hideAddNew = false, 
+    sortState
 }: GalleryViewProps) => {
     const [activeTag, setActiveTag] = useState('');
     const { bookmarks, total, isLoading, fetchBookmarks, deleteBookmark, handleFavoriteToggle } = useBookmarks();
@@ -37,11 +40,13 @@ export const GalleryView = ({
             search: searchQuery || undefined,
             folderId: activeFolderId,
             tag: activeTagName || undefined,
-            favoritesOnly: favoritesOnly || undefined, 
+            favoritesOnly: favoritesOnly || undefined,
+            sortBy: sortState?.sortBy, 
+            sortDir: sortState?.sortDir, 
         });
         // limpia filtro local al cambiar contexto
         setActiveTag('');
-    }, [searchQuery, activeFolderId, activeTagName, favoritesOnly]);
+    }, [searchQuery, activeFolderId, activeTagName, favoritesOnly, sortState]);
 
     // extrae etiquetas unicas de los bookmarks cargados
     const availableTags = useMemo(() => {

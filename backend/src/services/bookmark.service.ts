@@ -25,6 +25,8 @@ interface ListBookmarksParams extends PaginationParams {
     folderId?: string;
     tagName?: string;
     favoritesOnly?: boolean;
+    sortBy?: 'createdAt' | 'title'; 
+    sortDir?: 'asc' | 'desc';   
 }
 
 // helper para validar URL 
@@ -86,8 +88,7 @@ export const listBookmarks = async (
     userId: string,
     params: ListBookmarksParams
 ): Promise<PaginatedResponse<unknown>> => {
-    const { page = 1, limit = 20, search, folderId, tagName, favoritesOnly } = params;
-    const skip = (page - 1) * limit;
+    const { page = 1, limit = 20, search, folderId, tagName, favoritesOnly, sortBy = 'createdAt', sortDir = 'desc' } = params;    const skip = (page - 1) * limit;
 
     const where = {
         userId,
@@ -120,7 +121,7 @@ export const listBookmarks = async (
         prisma.bookmark.findMany({
             where,
             include: bookmarkInclude,
-            orderBy: { createdAt: 'desc' },
+            orderBy: {  [sortBy]: sortDir },
             skip,
             take: limit,
         }),

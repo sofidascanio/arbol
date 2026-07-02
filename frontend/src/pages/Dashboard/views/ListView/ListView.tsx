@@ -5,6 +5,7 @@ import { Tag } from '@/components/ui/Tag/Tag';
 import { cn } from '@/utils/cn';
 import { bookmarkService } from '@/services/bookmark.service';
 import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal';
+import { SortState } from '@/types/sort';
 import styles from './ListView.module.css';
 
 interface ListViewProps {
@@ -16,6 +17,7 @@ interface ListViewProps {
     onEdit?: (bookmark: Bookmark) => void;
     onDelete?: (id: string) => void;
     hideAddNew?: boolean;
+    sortState?: SortState;
 }
 
 const getDomain = (url: string): string => {
@@ -56,6 +58,7 @@ export const ListView = ({
     onEdit,
     onDelete,
     hideAddNew = false,
+    sortState
 }: ListViewProps) => {
     const { bookmarks, total, isLoading, fetchBookmarks, handleFavoriteToggle } = useBookmarks();
 
@@ -68,8 +71,10 @@ export const ListView = ({
             folderId: activeFolderId,
             tag: activeTagName || undefined,
             favoritesOnly: favoritesOnly || undefined,
+            sortBy: sortState?.sortBy,
+            sortDir: sortState?.sortDir,
         });
-    }, [searchQuery, activeFolderId, activeTagName, favoritesOnly]); 
+    }, [searchQuery, activeFolderId, activeTagName, favoritesOnly, sortState]); 
 
     return (
         <div className={styles.container}>

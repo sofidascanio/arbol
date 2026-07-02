@@ -7,6 +7,8 @@ import { useFolders } from '@/hooks/useFolders';
 import { useToastContext } from '@/context/ToastContext';
 import { bookmarkService } from '@/services/bookmark.service';
 import { Bookmark } from '@/types';
+import { SortState } from '@/types/sort';
+import { useSortContext } from '@/context/SortContext';
 import styles from './Favorites.module.css';
 
 export const Favorites = () => {
@@ -18,6 +20,8 @@ export const Favorites = () => {
 
 	const { folders } = useFolders();
 	const toast = useToastContext();
+
+	const { sortState } = useSortContext();
 
 	const handleSearch = useCallback((q: string) => setSearchQuery(q), []);
 	const handleAddNew = useCallback(() => {
@@ -111,6 +115,7 @@ export const Favorites = () => {
 						onEdit={handleEdit}
 						favoritesOnly
 						hideAddNew
+						sortState={sortState}
 					/>
 				)}
 				{viewMode === 'list' && (
@@ -122,6 +127,7 @@ export const Favorites = () => {
 						onDelete={handleDelete}
 						favoritesOnly
 						hideAddNew
+						sortState={sortState}
 					/>
 				)}
 			</div>

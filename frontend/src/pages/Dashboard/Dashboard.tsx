@@ -13,6 +13,8 @@ import { bookmarkService } from '@/services/bookmark.service';
 import { EditBookmarkModal } from './components/EditBookmarkModal/EditBookmarkModal';
 import { Bookmark } from '@/types';
 import { tagService } from '@/services/tag.service';
+import { SortState } from '@/types/sort';
+import { useSortContext } from '@/context/SortContext';
 import styles from './Dashboard.module.css';
 
 
@@ -88,6 +90,15 @@ export const Dashboard = ({ children }: DashboardProps) => {
     const handleEditSuccess = useCallback(() => {
         setRefreshKey(k => k + 1);
     }, []);
+    
+    const { sortState, handleSortChange: setSortFromContext } = useSortContext();
+    
+    const handleSortChange = useCallback((sort: SortState) => {
+        setSortFromContext(sort);
+        if (viewMode !== 'folders') {
+            setRefreshKey(k => k + 1);
+        }
+    }, [viewMode, setSortFromContext]);
 
     const handleCreateFolder = useCallback(async (name: string) => {
         await createFolder({
@@ -174,6 +185,8 @@ export const Dashboard = ({ children }: DashboardProps) => {
                     onAddNew={handleAddNew}
                     hideViewTabs={!!children}
                     hideSearch={!!children} 
+                    sortState={sortState} 
+                    onSortChange={handleSortChange}  
                 />
 
                 <main className={styles.content}>
@@ -187,6 +200,7 @@ export const Dashboard = ({ children }: DashboardProps) => {
                                     activeTagName={activeTagName}
                                     onAddNew={handleAddNew}
                                     onEdit={handleEdit} 
+                                    sortState={sortState}  
                                 />
                             )}
                             {viewMode === 'list' && (
@@ -198,14 +212,15 @@ export const Dashboard = ({ children }: DashboardProps) => {
                                     onAddNew={handleAddNew}
                                     onEdit={handleEdit}
                                     onDelete={handleDeleteFromList}
+                                    sortState={sortState}
                                 />
                             )}
                             {viewMode === 'folders' && (
                                 <FoldersView
-                                    key={`folders-${refreshKey}`}
                                     searchQuery={deferredSearch}
                                     onAddNew={handleAddNew}
                                     onEdit={handleEdit}
+                                    sortState={sortState} 
                                 />
                             )}
                         </>

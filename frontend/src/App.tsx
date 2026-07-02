@@ -8,6 +8,7 @@ import { ToastProvider } from '@/context/ToastContext';
 import { ImportExport } from '@/pages/ImportExport/ImportExport';
 import { Favorites } from '@/pages/Favorites/Favorites';
 import { Settings } from '@/pages/Settings/Settings';
+import { SortProvider } from '@/context/SortContext';
 import '@/styles/global.css';
 import '@/styles/typography.css';
 
@@ -51,7 +52,9 @@ const AppRoutes = () => {
 				path="/"
 				element={
 				<ProtectedRoute>
-					<Dashboard />
+					<SortProvider> 
+						<Dashboard />
+					</SortProvider>
 				</ProtectedRoute>
 				}
 			/>
@@ -59,9 +62,11 @@ const AppRoutes = () => {
 				path="/import-export"
 				element={
 					<ProtectedRoute>
-						<Dashboard>
-							<ImportExport />
-						</Dashboard>
+						<SortProvider>
+							<Dashboard>
+								<ImportExport />
+							</Dashboard>
+						</SortProvider>
 					</ProtectedRoute>
 				}
 				/>
@@ -69,9 +74,11 @@ const AppRoutes = () => {
 				path="/favorites"
 				element={
 					<ProtectedRoute>
-					<Dashboard>
-						<Favorites />
-					</Dashboard>
+						<SortProvider> 
+							<Dashboard>
+								<Favorites />
+							</Dashboard>
+						</SortProvider>
 					</ProtectedRoute>
 				}
 			/>
@@ -79,9 +86,11 @@ const AppRoutes = () => {
 				path="/settings"
 				element={
 					<ProtectedRoute>
-					<Dashboard>
-						<Settings />
-					</Dashboard>
+						<SortProvider>
+							<Dashboard>
+								<Settings />
+							</Dashboard>
+						</SortProvider>
 					</ProtectedRoute>
 				}
 			/>

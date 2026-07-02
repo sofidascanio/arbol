@@ -8,15 +8,17 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal/ConfirmModal';
 import { cn } from '@/utils/cn';
 import { folderService } from '@/services/folder.service';
 import { useToastContext } from '@/context/ToastContext';
+import { SortState } from '@/types/sort';
 import styles from './FoldersView.module.css';
 
 interface FoldersViewProps {
     searchQuery: string;
     onAddNew: () => void;
     onEdit?: (bookmark: Bookmark) => void;
+    sortState?: SortState;
 }
 
-export const FoldersView = ({ searchQuery, onAddNew, onEdit }: FoldersViewProps) => {
+export const FoldersView = ({ searchQuery, onAddNew, onEdit, sortState }: FoldersViewProps) => {
     const { folders, isLoading: foldersLoading, createFolder, fetchFolders } = useFolders();
     const { bookmarks, isLoading: bookmarksLoading, fetchBookmarks, deleteBookmark, handleFavoriteToggle } = useBookmarks();
 
@@ -69,18 +71,10 @@ export const FoldersView = ({ searchQuery, onAddNew, onEdit }: FoldersViewProps)
             search: searchQuery || undefined,
             folderId: currentFolder?.id,
             tag: activeFilter || undefined,
+            sortBy: sortState?.sortBy,
+            sortDir: sortState?.sortDir,
         });
-        setActiveFilter('');
-    }, [searchQuery, currentFolder?.id]);
-
-    // re-fetch al cambiar etiqueta sin resetearla
-    useEffect(() => {
-        fetchBookmarks({
-            search: searchQuery || undefined,
-            folderId: currentFolder?.id,
-            tag: activeFilter || undefined,
-        });
-    }, [activeFilter]); 
+    }, [searchQuery, currentFolder?.id, activeFilter, sortState]);
 
     // extrae etiquetas unicas de los bookmarks cargados
     const availableTags = useMemo(() => {

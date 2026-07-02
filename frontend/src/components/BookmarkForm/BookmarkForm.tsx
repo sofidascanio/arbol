@@ -274,7 +274,7 @@ export const BookmarkForm = ({
                     <input
                         id="tag-input"
                         className={styles.tagInput}
-                        placeholder="Escribí para crear una etiqueta nueva..."
+                        placeholder="Escribi para crear una etiqueta nueva..."
                         value={tagInput}
                         onChange={e => setTagInput(e.target.value)}
                         onKeyDown={handleTagKeyDown}

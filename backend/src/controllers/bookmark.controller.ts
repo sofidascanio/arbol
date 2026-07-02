@@ -29,6 +29,8 @@ export const list = async (
             folderId: req.query.folderId as string | undefined,
             tagName: req.query.tag as string | undefined,
             favoritesOnly: req.query.favoritesOnly === 'true',
+            sortBy: (req.query.sortBy as 'createdAt' | 'title') || 'createdAt', 
+            sortDir: (req.query.sortDir as 'asc' | 'desc') || 'desc',  
         });
 
         sendSuccess(res, result);

@@ -119,6 +119,8 @@
     transition:
         background-color var(--transition-fast),
         color var(--transition-fast);
+    flex-direction: column;
+    gap: 1px;
 }
 
 .iconBtn:hover {
@@ -152,4 +154,23 @@
 .themeBtn:hover {
     background-color: var(--surface-container-high);
     color: var(--on-surface);
+}
+
+.iconBtnActive {
+    background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
+}
+
+.iconBtnActive:hover {
+    background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
+    opacity: 0.85;
+}
+
+.sortDirIndicator {
+    font-size: 9px;
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+    letter-spacing: 0.03em;
+    margin-top: 1px;
 }
