@@ -1,4 +1,4 @@
-/* contenedor principal  */
+/* contenedor principal */
 .popup {
     width: 360px;
     min-height: 450px;
@@ -12,7 +12,7 @@
     color: var(--on-surface);
 }
 
-/* cabecera  */
+/* cabecera */
 .header {
     display: flex;
     align-items: center;
@@ -65,7 +65,19 @@
     background-color: var(--surface-container-high);
 }
 
-/* cuerpo  */
+/* badge "Guardado" en el header */
+.savedBadge {
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--on-secondary-container);
+    background-color: var(--secondary-container);
+    padding: 1px 6px;
+    border-radius: var(--radius-full);
+}
+
+/* cuerpo */
 .body {
     flex: 1;
     display: flex;
@@ -75,7 +87,7 @@
     overflow-y: auto;
 }
 
-/* vista previa de la pagina  */
+/* preview de la página */
 .preview {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -111,7 +123,7 @@
     background-color: rgba(33, 32, 26, 0.04);
 }
 
-/* identidad de la pagina  */
+/* identidad de la página */
 .pageIdentity {
     display: flex;
     align-items: center;
@@ -145,6 +157,7 @@
 .pageNameWrapper {
     flex: 1;
     min-width: 0;
+    overflow: hidden;
 }
 
 .pageNameLabel {
@@ -159,10 +172,11 @@
 
 .pageNameInput {
     width: 100%;
+    box-sizing: border-box;
     background-color: var(--surface-container-low);
     border: none;
     border-radius: var(--radius-md);
-    padding: var(--space-sm) var(--space-sm);
+    padding: var(--space-sm);
     font-family: var(--font-family);
     font-size: var(--font-size-body-md);
     font-weight: var(--font-weight-medium);
@@ -180,17 +194,76 @@
     opacity: 0.5;
 }
 
-/* fila de organizacion  */
-.orgRow {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+/* banner: ya guardado */
+.savedInfo {
+    display: flex;
+    align-items: flex-start;
     gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md);
 }
 
+.savedInfoIcon {
+    font-size: 18px;
+    color: var(--primary);
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-variation-settings: 'FILL' 1;
+}
+
+.savedInfoBody {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.savedInfoTitle {
+    font-size: var(--font-size-label-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--on-surface);
+}
+
+.savedInfoMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.savedInfoFolder {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--font-size-caption);
+    color: var(--on-surface-variant);
+}
+
+.savedInfoTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.savedInfoTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px var(--space-sm);
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    font-size: 10px;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.03em;
+}
+
+/* campo genérico */
 .fieldGroup {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
 }
 
 .fieldLabel {
@@ -215,30 +288,16 @@
     pointer-events: none;
 }
 
-.fieldInput {
+/* selector de carpeta a ancho completo */
+.fieldSelectFull {
     width: 100%;
-    background-color: var(--surface-container-low);
-    border: none;
-    border-radius: var(--radius-md);
-    padding: var(--space-sm) var(--space-sm) var(--space-sm) calc(var(--space-sm) + 20px + 4px);
-    font-family: var(--font-family);
-    font-size: var(--font-size-body-md);
-    color: var(--on-surface);
-    outline: none;
-    transition: box-shadow var(--transition-fast);
-}
-
-.fieldInput:focus {
-    box-shadow: 0 0 0 1px var(--primary);
-}
-
-.fieldSelect {
-    width: 100%;
+    box-sizing: border-box;
     appearance: none;
     background-color: var(--surface-container-low);
     border: none;
     border-radius: var(--radius-md);
-    padding: var(--space-sm) var(--space-xl) var(--space-sm) var(--space-sm);
+    padding: var(--space-sm) var(--space-xl) var(--space-sm)
+        calc(var(--space-sm) + 20px + 4px);
     font-family: var(--font-family);
     font-size: var(--font-size-body-md);
     color: var(--on-surface);
@@ -247,7 +306,7 @@
     transition: box-shadow var(--transition-fast);
 }
 
-.fieldSelect:focus {
+.fieldSelectFull:focus {
     box-shadow: 0 0 0 1px var(--primary);
 }
 
@@ -261,54 +320,60 @@
     pointer-events: none;
 }
 
-/* tags en el popup  */
-.tagsRow {
+/* grid de etiquetas del usuario */
+.tagsGrid {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-xs);
-    align-items: center;
 }
 
 .tagChip {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 2px var(--space-sm);
-    background-color: var(--secondary-container);
-    color: var(--on-secondary-container);
+    padding: 3px var(--space-sm);
+    background-color: var(--surface-container);
+    color: var(--on-surface-variant);
     border-radius: var(--radius-full);
+    font-family: var(--font-family);
     font-size: var(--font-size-label-sm);
     font-weight: var(--font-weight-semibold);
-    border: 1px solid transparent;
-    letter-spacing: var(--letter-spacing-label-sm);
-}
-
-.tagChipIcon {
-    font-size: 12px;
-}
-
-.addTagBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
     border: 1px solid var(--outline-variant);
-    border-radius: 50%;
-    background: none;
+    letter-spacing: var(--letter-spacing-label-sm);
     cursor: pointer;
-    color: var(--on-surface-variant);
     transition:
-        border-color var(--transition-fast),
-        color var(--transition-fast);
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        border-color var(--transition-fast);
 }
 
-.addTagBtn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
+.tagChip:hover {
+    background-color: var(--surface-container-high);
+    color: var(--on-surface);
 }
 
-/* estados: login y cargando  */
+/* estado seleccionado, el color real lo aplica el inline style */
+.tagChipSelected {
+    border-width: 1px;
+}
+
+/* puntito de color del tag */
+.tagDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* texto cuando no hay etiquetas */
+.tagsEmpty {
+    font-size: var(--font-size-caption);
+    color: var(--on-surface-variant);
+    opacity: 0.6;
+    margin: 0;
+}
+
+/* estados: login y cargando */
 .centerState {
     flex: 1;
     display: flex;
@@ -338,7 +403,7 @@
     line-height: var(--line-height-body-md);
 }
 
-/* login en el popup */
+/* login */
 .loginForm {
     display: flex;
     flex-direction: column;
@@ -348,6 +413,7 @@
 
 .loginInput {
     width: 100%;
+    box-sizing: border-box;
     background-color: var(--surface-container-low);
     border: none;
     border-radius: var(--radius-md);
@@ -449,7 +515,7 @@
     cursor: not-allowed;
 }
 
-/* toast del popup  */
+/* toast */
 .toast {
     position: fixed;
     bottom: var(--space-md);
@@ -484,7 +550,7 @@
     }
 }
 
-/* spinner  */
+/* spinner */
 .spinner {
     width: 14px;
     height: 14px;

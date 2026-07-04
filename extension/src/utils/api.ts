@@ -48,7 +48,7 @@ const request = async <T>(
     return json.data as T;
 };
 
-// endpoints 
+// Tipos 
 interface LoginResult {
     token: string;
     user: { id: string; email: string; createdAt: string };
@@ -59,7 +59,7 @@ interface Folder {
     name: string;
     parentId: string | null;
     children: Folder[];
-    }
+}
 
 interface Bookmark {
     id: string;
@@ -67,6 +67,24 @@ interface Bookmark {
     url: string;
 }
 
+export interface BookmarkFull {
+    id: string;
+    title: string;
+    url: string;
+    folderId: string | null;
+    folder: { id: string; name: string } | null;
+    tags: { tag: { id: string; name: string; color: string } }[];
+    isFavorite: boolean;
+}
+
+export interface Tag {
+    id: string;
+    name: string;
+    color: string;
+    bookmarkCount: number;
+}
+
+// API 
 export const extApi = {
     login: (email: string, password: string) =>
         request<LoginResult>('/auth/login', {
@@ -80,6 +98,9 @@ export const extApi = {
     getFolders: () =>
         request<{ folders: Folder[] }>('/folders'),
 
+    getTags: () =>
+        request<{ tags: Tag[] }>('/tags'),
+
     createBookmark: (data: {
         title: string;
         url: string;
@@ -92,8 +113,25 @@ export const extApi = {
             body: JSON.stringify(data),
         }),
 
+    updateBookmark: (id: string, data: {
+        title?: string;
+        folderId?: string | null;
+        tagNames?: string[];
+    }) =>
+        request<{ bookmark: BookmarkFull }>(`/bookmarks/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+
+    // busca el marcador por URL exacta, devuelve null si no existe
+    getBookmarkByUrl: async (url: string): Promise<BookmarkFull | null> => {
+        const data = await request<{ items: BookmarkFull[] }>(
+            `/bookmarks?search=${encodeURIComponent(url)}&limit=10`
+        );
+        return data.items.find(b => b.url === url) ?? null;
+    },
+
     deleteBookmarkByUrl: async (url: string): Promise<void> => {
-        // busca el marcador por url y lo elimina
         const data = await request<{ items: Bookmark[] }>(
             `/bookmarks?search=${encodeURIComponent(url)}&limit=5`
         );

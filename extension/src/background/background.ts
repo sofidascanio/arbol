@@ -1,9 +1,8 @@
 import { storage } from '../utils/storage';
 import { extApi, ExtApiError } from '../utils/api';
 
-// instalacion 
+// instalacion
 chrome.runtime.onInstalled.addListener(() => {
-    // crea menu contextual al instalar
     chrome.contextMenus.create({
         id: 'save-bookmark',
         title: 'Guardar en Arbol',
@@ -16,7 +15,6 @@ chrome.runtime.onInstalled.addListener(() => {
         contexts: ['link'],
     });
 
-    // alarma de sincronizacion cada 30 minutos
     chrome.alarms.create('sync-bookmarks', {
         periodInMinutes: 30,
     });
@@ -24,12 +22,50 @@ chrome.runtime.onInstalled.addListener(() => {
     console.info('[Arbol] Instalada correctamente');
 });
 
-// menu contextual 
+// badge segun si la URL esta guardada 
+const updateBadgeForTab = async (tabId: number) => {
+    const token = await storage.getToken();
+    if (!token) {
+        chrome.action.setBadgeText({ text: '', tabId });
+        return;
+    }
+
+    try {
+        const tab = await chrome.tabs.get(tabId);
+        if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('edge://')) {
+            chrome.action.setBadgeText({ text: '', tabId });
+            return;
+        }
+
+        const existing = await extApi.getBookmarkByUrl(tab.url);
+        if (existing) {
+            chrome.action.setBadgeText({ text: '★', tabId });
+            chrome.action.setBadgeBackgroundColor({ color: '#21201a', tabId });
+        } else {
+            chrome.action.setBadgeText({ text: '', tabId });
+        }
+    } catch {
+        chrome.action.setBadgeText({ text: '', tabId });
+    }
+};
+
+// actualiza badge cuando el usuario cambia de pestaña
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    await updateBadgeForTab(activeInfo.tabId);
+});
+
+// actualiza badge cuando la pestaña termina de cargar
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+    if (changeInfo.status === 'complete') {
+        await updateBadgeForTab(tabId);
+    }
+});
+
+// menu contextual
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const token = await storage.getToken();
 
     if (!token) {
-        // no esta autenticado autenticado, abre popup
         chrome.action.openPopup();
         return;
     }
@@ -41,7 +77,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         url = info.linkUrl;
         title = info.selectionText || new URL(info.linkUrl).hostname;
     } else {
-        // guarda la pagina actual
         url = tab?.url ?? info.pageUrl;
         title = tab?.title ?? new URL(url).hostname;
     }
@@ -49,7 +84,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     try {
         await extApi.createBookmark({ title, url });
 
-        // notificacion de exito
+        // actualizar badge de la pestaña actual
+        if (tab?.id) await updateBadgeForTab(tab.id);
+
         chrome.notifications.create({
             type: 'basic',
             iconUrl: '/public/icons/icon-48.png',
@@ -70,7 +107,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
 });
 
-// alarmas (sincronizacion periodica) 
+// alarmas (sincronizacion periodica)
 chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (alarm.name !== 'sync-bookmarks') return;
 
@@ -78,21 +115,18 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (!token) return;
 
     try {
-        // verifica que el token sigue siendo valido
         await extApi.me();
         await storage.setLastSync(new Date().toISOString());
         console.info('[Arbol] Sincronización completada');
     } catch {
-        // token expirado, limpia auth
         await storage.clearAuth();
         console.info('[Arbol] Token expirado, sesión cerrada');
     }
 });
 
-// mensajes desde el popup 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+// mensajes desde el popup
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'GET_TAB_INFO') {
-        // el popup pide info de la pestaña activa
         chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
             const tab = tabs[0];
             sendResponse({
@@ -101,15 +135,27 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
                 favIconUrl: tab?.favIconUrl ?? '',
             });
         });
-        return true; // necesario para respuesta async
+        return true;
     }
 
     if (message.type === 'BOOKMARK_SAVED') {
-        // actualiza badge del icono de la extension
-        chrome.action.setBadgeText({ text: '✓' });
-        chrome.action.setBadgeBackgroundColor({ color: '#4ade80' });
-        setTimeout(() => {
-            chrome.action.setBadgeText({ text: '' });
-        }, 2000);
+        // actualiza badge de la pestaña activa
+        chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+            const tabId = tabs[0]?.id;
+            if (tabId) {
+                chrome.action.setBadgeText({ text: '★', tabId });
+                chrome.action.setBadgeBackgroundColor({ color: '#21201a', tabId });
+            }
+        });
+    }
+
+    if (message.type === 'BOOKMARK_REMOVED') {
+        // limpia badge de la pestaña activa
+        chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+            const tabId = tabs[0]?.id;
+            if (tabId) {
+                chrome.action.setBadgeText({ text: '', tabId });
+            }
+        });
     }
 });
