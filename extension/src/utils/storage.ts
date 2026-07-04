@@ -8,7 +8,7 @@ const KEYS = {
 
 interface StoredUser {
     id: string;
-    email: string;
+    username: string;
 }
 
 // helpers 

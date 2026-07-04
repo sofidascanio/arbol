@@ -51,7 +51,7 @@ const request = async <T>(
 // Tipos 
 interface LoginResult {
     token: string;
-    user: { id: string; email: string; createdAt: string };
+    user: { id: string; username: string; createdAt: string };
 }
 
 interface Folder {
@@ -86,10 +86,10 @@ export interface Tag {
 
 // API 
 export const extApi = {
-    login: (email: string, password: string) =>
+    login: (username: string, password: string) =>
         request<LoginResult>('/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ username, password }),
         }),
 
     me: () =>

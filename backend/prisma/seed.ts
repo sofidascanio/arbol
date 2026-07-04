@@ -17,19 +17,19 @@ async function main(): Promise<void> {
 
     const alex = await prisma.user.create({
         data: {
-            email: 'alex@example.com',
+            username: 'alex',
             password: passwordHash,
         },
     });
 
     const sara = await prisma.user.create({
         data: {
-            email: 'sara@example.com',
+            username: 'sara',
             password: passwordHash,
         },
     });
 
-    console.info(`Created users: ${alex.email}, ${sara.email}`);
+    console.info(`Created users: ${alex.username}, ${sara.username}`);
 
     const tags = await Promise.all([
         prisma.tag.create({ data: { name: 'design',        color: '#60a5fa', userId: alex.id } }),
@@ -87,7 +87,7 @@ async function main(): Promise<void> {
         },
     });
 
-    console.info(`Created folders for ${alex.email}`);
+    console.info(`Created folders for ${alex.username}`);
 
     // marcadores de Alex 
     const bookmarksData = [
@@ -214,7 +214,7 @@ async function main(): Promise<void> {
         });
     }
 
-    console.info(`✅ Created ${bookmarksData.length} bookmarks for ${alex.email}`);
+    console.info(`✅ Created ${bookmarksData.length} bookmarks for ${alex.username}`);
 
     // carpetas y marcadores de Sara (datos minimos) 
     const saraWork = await prisma.folder.create({
@@ -231,7 +231,7 @@ async function main(): Promise<void> {
         },
     });
 
-    console.info(`Created sample data for ${sara.email}`);
+    console.info(`Created sample data for ${sara.username}`);
     console.info('Seed completed successfully!');
 }
 

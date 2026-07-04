@@ -61,7 +61,7 @@ export const Popup = () => {
     const [isRemoving, setIsRemoving] = useState(false);
 
     // login
-    const [loginEmail, setLoginEmail] = useState('');
+    const [loginUsername, setLoginUsername] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
     const [loginError, setLoginError] = useState('');
     const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -141,16 +141,16 @@ export const Popup = () => {
 
     // login
     const handleLogin = async () => {
-        if (!loginEmail || !loginPassword) {
-            setLoginError('Completá todos los campos');
+        if (!loginUsername || !loginPassword) {
+            setLoginError('Completa todos los campos');
             return;
         }
         setIsLoggingIn(true);
         setLoginError('');
         try {
-            const data = await extApi.login(loginEmail, loginPassword);
+            const data = await extApi.login(loginUsername, loginPassword);
             await storage.setToken(data.token);
-            await storage.setUser({ id: data.user.id, email: data.user.email });
+            await storage.setUser({ id: data.user.id, username: data.user.username });
             window.location.reload();
         } catch (error) {
             setLoginError(
@@ -263,15 +263,15 @@ export const Popup = () => {
                         </span>
                         <h2 className={styles.stateTitle}>Ingresá a tu cuenta</h2>
                         <p className={styles.stateSub}>
-                            Necesitás iniciar sesión para guardar marcadores.
+                            Necesitas iniciar sesión para guardar marcadores.
                         </p>
                         <div className={styles.loginForm}>
                             <input
                                 className={styles.loginInput}
-                                type="email"
-                                placeholder="tu@email.com"
-                                value={loginEmail}
-                                onChange={e => setLoginEmail(e.target.value)}
+                                type="text"
+                                placeholder="Nombre de usuario"
+                                value={loginUsername}
+                                onChange={e => setLoginUsername(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleLogin()}
                                 autoFocus
                             />

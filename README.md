@@ -312,7 +312,7 @@ Authorization: Bearer <token>
 ```prisma
 model User {
     id        String   @id @default(cuid())
-    email     String   @unique
+    username  String   @unique
     password  String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

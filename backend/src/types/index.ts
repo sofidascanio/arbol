@@ -3,7 +3,13 @@ import { Request } from 'express';
 
 export interface AuthPayload {
     id: string;
-    email: string;
+    username: string;
+}
+
+export interface User {
+    id: string;
+    username: string;
+    createdAt: string;
 }
 
 // request tipado con usuario (middleware auth)

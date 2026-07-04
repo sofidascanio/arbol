@@ -299,7 +299,7 @@ export const SideNav = ({
                             person
                         </span>
                     </div>
-                    <span className={styles.userName}>{user?.email}</span>
+                    <span className={styles.userName}>{user?.username}</span>
                 </div>
             </div>
 

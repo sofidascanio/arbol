@@ -1,9 +1,13 @@
 import { body } from 'express-validator';
 
-export const emailValidation = body('email')
-    .isEmail()
-    .withMessage('Tiene que ser un email valido')
-    .normalizeEmail();
+export const usernameValidation = body('username')
+    .trim()
+    .notEmpty()
+    .withMessage('El nombre de usuario es requerido')
+    .isLength({ min: 3, max: 30 })
+    .withMessage('Debe tener entre 3 y 30 caracteres')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Solo letras, números y guión bajo');
 
 export const passwordValidation = body('password')
     .isLength({ min: 8 })
@@ -13,6 +17,6 @@ export const passwordValidation = body('password')
     .matches(/[0-9]/)
     .withMessage('Debe contener al menos un número.');
 
-export const registerSchema = [emailValidation, passwordValidation];
+export const registerSchema = [usernameValidation, passwordValidation];
 
-export const loginSchema = [emailValidation];
+export const loginSchema = [usernameValidation];

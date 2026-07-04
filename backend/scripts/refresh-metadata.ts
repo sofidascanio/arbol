@@ -26,15 +26,15 @@ async function main(): Promise<void> {
             await prisma.bookmark.update({
                 where: { id: bm.id },
                 data: {
-                faviconUrl: meta.faviconUrl ?? undefined,
-                imageUrl: meta.imageUrl ?? undefined,
+                    faviconUrl: meta.faviconUrl ?? undefined,
+                    imageUrl: meta.imageUrl ?? undefined,
                 },
             });
 
-            console.info(`✅ ${bm.title}`);
+            console.info(`✔ ${bm.title}`);
             success++;
         } catch {
-            console.error(`❌ ${bm.title} — ${bm.url}`);
+            console.error(`× ${bm.title} — ${bm.url}`);
             failed++;
         }
 

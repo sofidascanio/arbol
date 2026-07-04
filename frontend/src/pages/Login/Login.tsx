@@ -10,7 +10,7 @@ export const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -19,14 +19,14 @@ export const Login = () => {
         e.preventDefault();
         setError('');
 
-        if (!email || !password) {
+        if (!username || !password) {
             setError('Completa todos los campos');
             return;
         }
 
         setIsLoading(true);
         try {
-            await login({ email, password });
+            await login({ username, password });
             navigate('/');
         } catch (err) {
             if (err instanceof ApiError) {
@@ -63,22 +63,22 @@ export const Login = () => {
             )}
 
             <Input
-                label="Correo electrónico"
-                type="email"
-                placeholder="tu@email.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                label="Nombre de usuario"
+                type="text"
+                placeholder="Nombre de usuario"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
                 leftIcon={
                     <span className="material-symbols-outlined">mail</span>
                 }
-                autoComplete="email"
+                autoComplete="username"
                 autoFocus
             />
 
             <Input
                 label="Contraseña"
                 type="password"
-                placeholder="Tu contraseña"
+                placeholder="Contraseña"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 leftIcon={

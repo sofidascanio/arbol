@@ -10,7 +10,7 @@ export const Register = () => {
     const { register } = useAuth();
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -19,8 +19,8 @@ export const Register = () => {
     const validate = (): boolean => {
         const newErrors: Record<string, string> = {};
 
-        if (!email) newErrors.email = 'El correo es requerido';
-        else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Correo inválido';
+        if (!username) newErrors.username = 'El correo es requerido';
+        else if (!/\S+@\S+\.\S+/.test(username)) newErrors.username = 'Correo inválido';
 
         if (!password) newErrors.password = 'La contraseña es requerida';
         else if (password.length < 8) newErrors.password = 'Mínimo 8 caracteres';
@@ -40,7 +40,7 @@ export const Register = () => {
 
         setIsLoading(true);
         try {
-            await register({ email, password });
+            await register({ username, password });
             navigate('/');
         } catch (err) {
             if (err instanceof ApiError) {
@@ -77,14 +77,14 @@ export const Register = () => {
                     )}
 
                     <Input
-                        label="Correo electrónico"
-                        type="email"
-                        placeholder="tu@email.com"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        error={errors.email}
-                        leftIcon={<span className="material-symbols-outlined">mail</span>}
-                        autoComplete="email"
+                        label="Nombre de usuario"
+                        type="text"
+                        placeholder="Nombre de usuario"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        error={errors.username}
+                        leftIcon={<span className="material-symbols-outlined">account_circle</span>}
+                        autoComplete="username"
                         autoFocus
                     />
 

@@ -10,8 +10,8 @@ export const register = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { email, password } = req.body as { email: string; password: string };
-        const result = await registerUser(email, password);
+        const { username, password } = req.body;
+        const result = await registerUser(username, password);
         sendSuccess(res, result, 'Se registro exitosamente el usuario.', 201);
     } catch (error) {
         next(error);
@@ -25,7 +25,7 @@ export const login = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { email, password } = req.body as { email: string; password: string };
+        const { username, password } = req.body as { username: string; password: string };
 
         if (!password) {
         res.status(400).json({
@@ -36,7 +36,7 @@ export const login = async (
         return;
         }
 
-        const result = await loginUser(email, password);
+        const result = await loginUser(username, password);
         sendSuccess(res, result, 'Login exitoso');
     } catch (error) {
         next(error);
