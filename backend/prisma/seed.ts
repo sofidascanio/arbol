@@ -214,7 +214,7 @@ async function main(): Promise<void> {
         });
     }
 
-    console.info(`✅ Created ${bookmarksData.length} bookmarks for ${alex.username}`);
+    console.info(`Created ${bookmarksData.length} bookmarks for ${alex.username}`);
 
     // carpetas y marcadores de Sara (datos minimos) 
     const saraWork = await prisma.folder.create({

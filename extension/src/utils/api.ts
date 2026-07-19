@@ -71,6 +71,7 @@ export interface BookmarkFull {
     id: string;
     title: string;
     url: string;
+    description: string | null; 
     folderId: string | null;
     folder: { id: string; name: string } | null;
     tags: { tag: { id: string; name: string; color: string } }[];
@@ -115,6 +116,7 @@ export const extApi = {
 
     updateBookmark: (id: string, data: {
         title?: string;
+        description?: string | null; 
         folderId?: string | null;
         tagNames?: string[];
     }) =>

@@ -32,7 +32,7 @@ interface ToastState {
 
 type PopupView = 'loading' | 'login' | 'main';
 
-// aplanar carpetas para el selector con indentación visual
+// aplanar carpetas para el selector con identancion visual
 const flattenFolders = (
     folders: Folder[],
     depth = 0
@@ -42,6 +42,26 @@ const flattenFolders = (
         ...flattenFolders(f.children ?? [], depth + 1),
     ]);
 
+// helper: convierte chrome.runtime.sendMessage a Promise
+const getTabInfo = (): Promise<TabInfo> =>
+    new Promise(resolve => {
+        chrome.runtime.sendMessage({ type: 'GET_TAB_INFO' }, (tab: TabInfo) => {
+            resolve(tab);
+        });
+    });
+
+// helper: convierte chrome.tabs.sendMessage a Promise
+const getPageMetadata = (tabId: number): Promise<PageMetadata | null> =>
+    new Promise(resolve => {
+        chrome.tabs.sendMessage(tabId, { type: 'GET_METADATA' }, (meta: PageMetadata) => {
+            if (chrome.runtime.lastError) {
+                resolve(null); // content script no disponible
+                return;
+            }
+            resolve(meta);
+        });
+    });
+
 export const Popup = () => {
     const [view, setView] = useState<PopupView>('loading');
     const [tabInfo, setTabInfo] = useState<TabInfo>({ url: '', title: '', favIconUrl: '' });
@@ -50,7 +70,7 @@ export const Popup = () => {
     const [userTags, setUserTags] = useState<Tag[]>([]);
     const [toast, setToast] = useState<ToastState | null>(null);
 
-    // marcador existente (si la URL ya está guardada)
+    // marcador existente (si la URL ya esta guardada)
     const [existingBookmark, setExistingBookmark] = useState<BookmarkFull | null>(null);
 
     // form
@@ -59,6 +79,7 @@ export const Popup = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [isSaving, setIsSaving] = useState(false);
     const [isRemoving, setIsRemoving] = useState(false);
+    const [description, setDescription] = useState('');
 
     // login
     const [loginUsername, setLoginUsername] = useState('');
@@ -71,7 +92,7 @@ export const Popup = () => {
         setTimeout(() => setToast(null), 3000);
     }, []);
 
-    // inicializacion
+    // inicializacion completamente secuencial, sin callbacks anidados
     useEffect(() => {
         const init = async () => {
             const token = await storage.getToken();
@@ -89,48 +110,62 @@ export const Popup = () => {
                 return;
             }
 
-            // info de la pestaña activa
-            chrome.runtime.sendMessage({ type: 'GET_TAB_INFO' }, async (tab: TabInfo) => {
-                setTabInfo(tab);
-                setTitle(tab.title);
+            // obtener info de la pestaña activa (await)
+            const tab = await getTabInfo();
+            setTabInfo(tab);
 
-                // verificar si la URL ya está guardada
-                if (tab.url) {
-                    try {
-                        const existing = await extApi.getBookmarkByUrl(tab.url);
-                        if (existing) {
-                            setExistingBookmark(existing);
-                            setTitle(existing.title);
-                            setFolderId(existing.folderId ?? '');
-                            setSelectedTags(existing.tags.map(bt => bt.tag.name));
-                        }
-                    } catch {
-                        // no está guardado, continuar normal
-                    }
-                }
-            });
+            // buscar metadatos de la pagina y marcador existente en paralelo
+            //    ambos con await antes de setear cualquier estado del form
+            const [meta, existing, foldersData, tagsData] = await Promise.allSettled([
+                // metadatos de la pag via content script
+                chrome.tabs.query({ active: true, currentWindow: true }).then(tabs => {
+                    const tabId = tabs[0]?.id;
+                    if (!tabId) return null;
+                    return getPageMetadata(tabId);
+                }),
+                // verifica si la URL ya está guardada
+                tab.url ? extApi.getBookmarkByUrl(tab.url).catch(() => null) : Promise.resolve(null),
+                // carpetas y etiquetas
+                extApi.getFolders().catch(() => ({ folders: [] })),
+                extApi.getTags().catch(() => ({ tags: [] })),
+            ]);
 
-            // metadatos de la página via content script
-            chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-                const tabId = tabs[0]?.id;
-                if (!tabId) return;
-                chrome.tabs.sendMessage(tabId, { type: 'GET_METADATA' }, (meta: PageMetadata) => {
-                    if (chrome.runtime.lastError) return;
-                    setMetadata(meta);
-                    if (meta.title && !title) setTitle(meta.title);
-                });
-            });
+            // setea metadatos de la pag (solo imagen, no description)
+            const metaValue = meta.status === 'fulfilled' ? meta.value : null;
+            if (metaValue) {
+                setMetadata(metaValue);
+            }
 
-            // carpetas y etiquetas en paralelo
-            try {
-                const [foldersData, tagsData] = await Promise.all([
-                    extApi.getFolders(),
-                    extApi.getTags(),
-                ]);
-                setFolders(foldersData.folders);
-                setUserTags(tagsData.tags);
-            } catch {
-                // no bloquear por error de datos secundarios
+            // setea carpetas y etiquetas
+            if (foldersData.status === 'fulfilled') {
+                setFolders((foldersData.value as { folders: Folder[] }).folders ?? []);
+            }
+            if (tagsData.status === 'fulfilled') {
+                setUserTags((tagsData.value as { tags: Tag[] }).tags ?? []);
+            }
+
+            // setea el form, primero con datos de la pag, luego el marcador
+            //    existente siempre pisa los valores de la pagina 
+            const existingValue = existing.status === 'fulfilled' ? existing.value : null;
+
+            if (existingValue) {
+                // marcador ya guardado: precarga con sus datos
+                setExistingBookmark(existingValue);
+                setTitle(existingValue.title);
+                setFolderId(existingValue.folderId ?? '');
+                setSelectedTags(existingValue.tags.map((bt: { tag: { name: string } }) => bt.tag.name));
+                setDescription(existingValue.description ?? '');
+                // la descripcion del marcador guardado siempre gana, nunca se pisa con meta.description
+            } else {
+                // marcador nuevo, usa datos de la pagina como punto de partida
+                setTitle(
+                    metaValue?.title ||
+                    tab.title ||
+                    ''
+                );
+                // description inicia vacia, el usuario la escribe si quiere
+                // no se precarga con meta.description
+                setDescription('');
             }
 
             setView('main');
@@ -179,6 +214,7 @@ export const Popup = () => {
                 // actualizar marcador existente
                 await extApi.updateBookmark(existingBookmark.id, {
                     title: title.trim(),
+                    description: description.trim() || null,
                     folderId: folderId || null,
                     tagNames: selectedTags,
                 });
@@ -188,7 +224,7 @@ export const Popup = () => {
                 await extApi.createBookmark({
                     title: title.trim(),
                     url: tabInfo.url,
-                    description: metadata.description,
+                    description: description.trim() || undefined,
                     folderId: folderId || undefined,
                     tagNames: selectedTags.length > 0 ? selectedTags : undefined,
                 });
@@ -442,6 +478,20 @@ export const Popup = () => {
                         </div>
                     </div>
                 )}
+
+                <div className={styles.fieldGroup}>
+                    <span className={styles.fieldLabel}>
+                        Descripción
+                        <span className={styles.fieldLabelOptional}> (opcional)</span>
+                    </span>
+                    <textarea
+                        className={styles.descriptionTextarea}
+                        placeholder="¿Por qué guardas este enlace?"
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
+                        rows={2}
+                    />
+                </div>
 
                 {/* selector de carpeta */}
                 <div className={styles.fieldGroup}>

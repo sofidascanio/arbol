@@ -563,3 +563,38 @@
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* textarea de descripcion */
+.descriptionTextarea {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--surface-container-low);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--space-sm);
+    font-family: var(--font-family);
+    font-size: var(--font-size-body-md);
+    color: var(--on-surface);
+    outline: none;
+    resize: none;
+    line-height: 1.5;
+    transition: box-shadow var(--transition-fast);
+}
+
+.descriptionTextarea:focus {
+    box-shadow: 0 0 0 1px var(--primary);
+}
+
+.descriptionTextarea::placeholder {
+    color: var(--on-surface-variant);
+    opacity: 0.5;
+}
+
+/* "(opcional)" en el label */
+.fieldLabelOptional {
+    font-weight: normal;
+    opacity: 0.6;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 9px;
+}

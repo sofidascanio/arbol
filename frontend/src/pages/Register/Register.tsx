@@ -19,8 +19,11 @@ export const Register = () => {
     const validate = (): boolean => {
         const newErrors: Record<string, string> = {};
 
-        if (!username) newErrors.username = 'El correo es requerido';
-        else if (!/\S+@\S+\.\S+/.test(username)) newErrors.username = 'Correo inválido';
+        if (!username) {
+            newErrors.username = 'El nombre de usuario es requerido';
+        } else if (!/^[A-Za-z0-9_]{3,30}$/.test(username)) {
+            newErrors.username = 'Debe tener entre 3 y 30 caracteres y solo contener letras, números y guión bajo';
+        }
 
         if (!password) newErrors.password = 'La contraseña es requerida';
         else if (password.length < 8) newErrors.password = 'Mínimo 8 caracteres';
